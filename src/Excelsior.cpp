@@ -6,10 +6,14 @@
 
 #include <iostream>
 #include <string>
+#include <format>
 
 #define SDL_MAIN_USE_CALLBACKS 1
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+
+#define WINDOW_HEIGHT 480
+#define WINDOW_WIDTH 640
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
@@ -21,6 +25,9 @@ static float tilt_x = 0.0f;
 static float tilt_y = 0.0f;
 
 static std::string topLeftTextMessage;
+
+static int height_offset;
+static int width_offset;
 
 // example taken from https://github.com/libsdl-org/SDL/blob/main/docs/hello.c
 // https://examples.libsdl.org/SDL3/pen/01-drawing-lines/
@@ -39,7 +46,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 	}
 
 	/* Create the window */
-	if (!SDL_CreateWindowAndRenderer("Excelsior", 640, 480, 0, &window, &renderer)) {
+	if (!SDL_CreateWindowAndRenderer("Excelsior", WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer)) {
 		SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
@@ -49,6 +56,9 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 
 	// make render target match output size so drawing matches pen's position on tablet displays
 	SDL_GetRenderOutputSize(renderer, &w, &h);
+	width_offset = WINDOW_WIDTH - w;
+	height_offset = WINDOW_HEIGHT - h;
+
 	render_target = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
 	if (!render_target) {
 		SDL_Log("Couldn't create render target: %s", SDL_GetError());
@@ -95,10 +105,26 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 			}
 			previous_touch_x = event->pmotion.x;
 			previous_touch_y = event->pmotion.y;
+			//previous_touch_x = event->pmotion.x + width_offset;
+			//previous_touch_y = event->pmotion.y + height_offset;
 		}
 		else {
 			previous_touch_x = previous_touch_y = -1.0f;
 		}
+	}
+
+	if (event->type == SDL_EVENT_WINDOW_RESIZED) {
+		int w, h;
+		SDL_GetRenderOutputSize(renderer, &w, &h);
+
+		width_offset = WINDOW_WIDTH - w;
+		height_offset = WINDOW_HEIGHT - h;
+
+		topLeftTextMessage = std::format(
+			"Window Resized: wOffset: {}, hOffset: {}",
+			width_offset,
+			height_offset
+		);
 	}
 
 	return SDL_APP_CONTINUE;
