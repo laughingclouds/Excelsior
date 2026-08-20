@@ -1,5 +1,8 @@
 ﻿// Excelsior.cpp : Defines the entry point for the application.
-//
+/* 
+* Moving or resizing window is stuttery
+* https://github.com/libsdl-org/SDL/issues/12528
+*/
 
 #include "Excelsior.h"
 
