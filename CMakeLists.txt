@@ -20,7 +20,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 add_subdirectory(vendored/SDL EXCLUDE_FROM_ALL)
 
 # Add source to this project's executable.
-add_executable (Excelsior WIN32 "src/Excelsior.cpp" "src/Excelsior.h")
+add_executable (Excelsior WIN32 "src/Excelsior.cpp")
 
 target_link_libraries(Excelsior PRIVATE SDL3::SDL3)
 
