@@ -4,9 +4,10 @@
 * https://github.com/libsdl-org/SDL/issues/12528
 */
 
+#include <algorithm>
+#include <format>
 #include <iostream>
 #include <string>
-#include <format>
 
 #define SDL_MAIN_USE_CALLBACKS 1
 #include <SDL3/SDL.h>
@@ -14,6 +15,7 @@
 
 #define WINDOW_HEIGHT 480
 #define WINDOW_WIDTH 640
+constexpr float PRESSURE_OFFSET = 0.5;
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
@@ -84,17 +86,6 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 		return SDL_APP_SUCCESS; /* end program, reporting success to OS */
 	}
 
-	// for some reason pressure isn't working
-	if (event->type == SDL_EVENT_PEN_DOWN) {
-		pressure = 1.0f;
-		topLeftTextMessage = "Pen Down";
-	}
-
-	if (event->type == SDL_EVENT_PEN_UP) {
-		pressure = 0.0f;
-		topLeftTextMessage = "Pen Up";
-	}
-
 	if (event->type == SDL_EVENT_PEN_MOTION) {
 		if (pressure > 0.0f) {
 			if (previous_touch_x >= 0.0f) { // only draw if we're moving while touching
@@ -125,6 +116,27 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 			width_offset,
 			height_offset
 		);
+	}
+	else if (event->type == SDL_EVENT_PEN_AXIS) {
+		if (event->paxis.axis == SDL_PEN_AXIS_PRESSURE) {
+			//SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "axis = %d, value = %f", event->paxis.axis, event->paxis.value);
+			const float rawPressure = event->paxis.value;
+			
+			pressure = (rawPressure == 0.0f) ? 0.0f : std::min(rawPressure + PRESSURE_OFFSET, 1.0f);
+
+			topLeftTextMessage = std::format(
+				"Actual pressure: {}, Offset: {}, New Pressure: {}",
+				rawPressure,
+				PRESSURE_OFFSET,
+				pressure
+			);
+		}
+		else if (event->paxis.axis == SDL_PEN_AXIS_XTILT) {
+			tilt_x = event->paxis.value;
+		}
+		else if (event->paxis.axis == SDL_PEN_AXIS_YTILT) {
+			tilt_y = event->paxis.value;
+		}
 	}
 
 	return SDL_APP_CONTINUE;
