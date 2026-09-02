@@ -50,6 +50,49 @@ Application::Application() {
 	m_topLeftTextMessage = getMsg();
 }
 
+SDL_AppResult Application::handleEvent(const SDL_Event& event) {
+	if (event.type == SDL_EVENT_QUIT) {
+		return SDL_APP_SUCCESS;
+	}
+
+	if (event.type == SDL_EVENT_PEN_MOTION) {
+		if (m_pressure > 0.0f) {
+			if (m_previous_touchX >= 0.0f) { // only draw if we're moving while touching
+				m_topLeftTextMessage = "Writing";
+				SDL_SetRenderTarget(m_renderer.get(), m_renderTarget.get());
+				SDL_SetRenderDrawColorFloat(m_renderer.get(), 1.0f, 1.0f, 1.0f, m_pressure);
+				SDL_RenderLine(m_renderer.get(), m_previous_touchX, m_previous_touchY, event.pmotion.x, event.pmotion.y);
+			}
+
+			m_previous_touchX = event.pmotion.x;
+			m_previous_touchY = event.pmotion.y;
+		}
+		else {
+			m_previous_touchX = m_previous_touchY = -1.0f;
+		}
+	}
+	else if (event.type == SDL_EVENT_PEN_AXIS) {
+		if (event.paxis.axis == SDL_PEN_AXIS_PRESSURE) {
+			const float rawPressure = event.paxis.value;
+
+			m_pressure = (rawPressure == 0.0f) ? 0.0f : std::min(rawPressure + PRESSURE_OFFSET, 1.0f);
+
+			m_topLeftTextMessage = std::format(
+				"Actual pressure: {}, offset: {}, New Pressure: {}",
+				rawPressure, PRESSURE_OFFSET, m_pressure
+			);
+		}
+		else if (event.paxis.axis == SDL_PEN_AXIS_XTILT) {
+			m_tiltX = event.paxis.value;
+		}
+		else if (event.paxis.axis == SDL_PEN_AXIS_YTILT) {
+			m_tiltY = event.paxis.value;
+		}
+	}
+
+	return SDL_APP_CONTINUE;
+}
+
 SDL_AppResult Application::update() {
 	// make sure we're drawing to window and not render target
 	SDL_SetRenderTarget(m_renderer.get(), nullptr);

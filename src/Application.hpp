@@ -1,9 +1,10 @@
 #pragma once
 
-#include <memory>
-#include <string>
+#include <algorithm>
 #include <format>
+#include <memory>
 #include <stdexcept>
+#include <string>
 
 #include <SDL3/SDL.h>
 
