@@ -49,3 +49,17 @@ Application::Application() {
 
 	m_topLeftTextMessage = getMsg();
 }
+
+SDL_AppResult Application::update() {
+	// make sure we're drawing to window and not render target
+	SDL_SetRenderTarget(m_renderer.get(), nullptr);
+	// non-drawing surface to be gray to distinguish
+	SDL_SetRenderDrawColor(m_renderer.get(), 100, 100, 100, SDL_ALPHA_OPAQUE);
+	SDL_RenderClear(m_renderer.get());
+
+	SDL_RenderTexture(m_renderer.get(), m_renderTarget.get(), nullptr, nullptr);
+	SDL_RenderDebugText(m_renderer.get(), 0, 8, m_topLeftTextMessage.c_str());
+	SDL_RenderPresent(m_renderer.get());
+
+	return SDL_APP_CONTINUE;
+}

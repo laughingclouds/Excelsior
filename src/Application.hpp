@@ -22,10 +22,15 @@ public:
 	static constexpr int WINDOW_WIDTH = 640;
 	static constexpr int WINDOW_HEIGHT = 480;
 	static constexpr float PRESSURE_OFFSET = 0.5f;
-
+	
+	/* Initialize Application + (window, renderer, texture)
+	To be called in SDL_AppInit*/
 	Application();
 
+	// Call within SDL_AppEvent
 	SDL_AppResult handleEvent(const SDL_Event& event);
+
+	// Call within SDL_AppIterate
 	SDL_AppResult update();
 
 private:
