@@ -1,4 +1,16 @@
 #include "Application.hpp"
+#include "Stroke.hpp"
+
+#include <algorithm>
+#include <format>
+#include <stdexcept>
+
+#include <SDL3/SDL.h>
+
+// custom deleters for unique pointers
+void SDLWindowDeleter::operator()(SDL_Window* w) const { SDL_DestroyWindow(w); }
+void SDLRendererDeleter::operator()(SDL_Renderer* r) const { SDL_DestroyRenderer(r); }
+void SDLTextureDeleter::operator()(SDL_Texture* t) const { SDL_DestroyTexture(t); }
 
 Application::Application() {
 	SDL_SetAppMetadata("Excelsior", "0.1", "com.github.laughingclouds");

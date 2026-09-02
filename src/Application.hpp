@@ -1,18 +1,18 @@
 #pragma once
 
-#include <algorithm>
-#include <format>
 #include <memory>
-#include <stdexcept>
 #include <string>
 
-#include <SDL3/SDL.h>
+// SDL forward declarations
+struct SDL_Window;
+struct SDL_Renderer;
+struct SDL_Texture;
+union SDL_Event;
+enum SDL_AppResult;
 
-#include "Stroke.hpp"
-
-struct SDLWindowDeleter { void operator()(SDL_Window* w) const { SDL_DestroyWindow(w); } };
-struct SDLRendererDeleter { void operator()(SDL_Renderer* r) const { SDL_DestroyRenderer(r); } };
-struct SDLTextureDeleter { void operator()(SDL_Texture* t) const { SDL_DestroyTexture(t); } };
+struct SDLWindowDeleter { void operator()(SDL_Window* w) const; };
+struct SDLRendererDeleter { void operator()(SDL_Renderer* r) const; };
+struct SDLTextureDeleter { void operator()(SDL_Texture* t) const; };
 
 using UniqueWindow = std::unique_ptr<SDL_Window, SDLWindowDeleter>;
 using UniqueRenderer = std::unique_ptr<SDL_Renderer, SDLRendererDeleter>;
