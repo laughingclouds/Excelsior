@@ -2,8 +2,12 @@
 
 #include <memory>
 #include <string>
+#include <format>
+#include <stdexcept>
 
 #include <SDL3/SDL.h>
+
+#include "Stroke.hpp"
 
 struct SDLWindowDeleter { void operator()(SDL_Window* w) const { SDL_DestroyWindow(w); } };
 struct SDLRendererDeleter { void operator()(SDL_Renderer* r) const { SDL_DestroyRenderer(r); } };
