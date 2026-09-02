@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include <SDL3/SDL.h>
 
@@ -10,6 +11,28 @@ struct SDLTextureDeleter { void operator()(SDL_Texture* t) const { SDL_DestroyTe
 
 using UniqueWindow = std::unique_ptr<SDL_Window, SDLWindowDeleter>;
 using UniqueRenderer = std::unique_ptr<SDL_Renderer, SDLRendererDeleter>;
-using UniqueWindow = std::unique_ptr<SDL_Texture, SDLTextureDeleter>;
+using UniqueTexture = std::unique_ptr<SDL_Texture, SDLTextureDeleter>;
 
-class Application {};
+class Application {
+public:
+	static constexpr int WINDOW_WIDTH = 640;
+	static constexpr int WINDOW_HEIGHT = 480;
+	static constexpr float PRESSURE_OFFSET = 0.5f;
+
+	Application();
+
+	SDL_AppResult handleEvent(const SDL_Event& event);
+	SDL_AppResult update();
+
+private:
+	UniqueWindow m_window;
+	UniqueRenderer m_renderer;
+	UniqueTexture m_renderTarget;
+
+	float m_previous_touch_x = -1.0f;
+	float m_previous_touch_y = -1.0f;
+	float m_tilt_x = 0.0f;
+	float m_tilt_y = 0.0f;
+
+	std::string m_topLeftTextMessage;
+};
