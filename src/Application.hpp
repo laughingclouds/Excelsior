@@ -33,10 +33,10 @@ private:
 	UniqueRenderer m_renderer;
 	UniqueTexture m_renderTarget;
 
-	float m_previous_touch_x = -1.0f;
-	float m_previous_touch_y = -1.0f;
-	float m_tilt_x = 0.0f;
-	float m_tilt_y = 0.0f;
+	float m_previous_touchX = -1.0f;
+	float m_previous_touchY = -1.0f;
+	float m_tiltX = 0.0f;
+	float m_tiltY = 0.0f;
 
 	std::string m_topLeftTextMessage;
 };
