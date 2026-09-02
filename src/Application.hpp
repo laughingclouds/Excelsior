@@ -40,6 +40,7 @@ private:
 
 	float m_previous_touchX = -1.0f;
 	float m_previous_touchY = -1.0f;
+	float m_pressure = 0.0f;
 	float m_tiltX = 0.0f;
 	float m_tiltY = 0.0f;
 
