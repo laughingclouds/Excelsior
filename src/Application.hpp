@@ -36,6 +36,8 @@ private:
 	/* A simple hello world window created by imgui */
 	void imguiHelloWorld();
 
+	void anotherWindow();
+
 	void procesPenMotion(const SDL_Event& event);
 	void processPenAxis(const SDL_Event& event);
 	

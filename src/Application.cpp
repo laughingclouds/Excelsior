@@ -177,6 +177,14 @@ SDL_AppResult Application::update() {
 
 	this->imguiHelloWorld();
 
+	if (m_show_another_window)
+		this->anotherWindow();
+
+	if (ImGui::Button("Close the other window"))
+		m_show_another_window = false;
+
+	ImGui::Text(m_topLeftTextMessage.c_str());
+
 	ImGui::Render();
 	ImGuiIO& io = ImGui::GetIO();
 	glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
@@ -216,5 +224,13 @@ void Application::imguiHelloWorld() {
 	ImGui::Text("counter = %d", counter);
 
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+	ImGui::End();
+}
+
+void Application::anotherWindow() {
+	ImGui::Begin("Another Window", &m_show_another_window);
+	ImGui::Text("Hello from another window!");
+	if (ImGui::Button("Close me"))
+		m_show_another_window = false;
 	ImGui::End();
 }
