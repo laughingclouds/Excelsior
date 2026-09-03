@@ -20,6 +20,8 @@ void GLContextDeleter::operator()(SDL_GLContext c) const {
 Application::Application() {
 	SDL_SetAppMetadata("Excelsior", "0.1", "com.github.laughingclouds");
 
+	m_topLeftTextMessage = getMsg();
+
 	// print which render drivers are available
 	SDL_Log("Available renderer drivers:");
 	for (int i = 0; i < SDL_GetNumRenderDrivers(); i++) {
@@ -66,72 +68,79 @@ Application::Application() {
 
 	SDL_Log("GL v%d.%d Initialized", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 
+
 	SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 
-	m_topLeftTextMessage = getMsg();
+	// gray background
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 }
 
 SDL_AppResult Application::handleEvent(const SDL_Event& event) {
-	if (event.type == SDL_EVENT_QUIT) {
+	switch (event.type) {
+	case SDL_EVENT_QUIT:
 		return SDL_APP_SUCCESS;
-	}
 
-	if (event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
+	case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: {
 		m_fbWidth = event.window.data1;
 		m_fbHeight = event.window.data2;
 		glViewport(0, 0, m_fbWidth, m_fbHeight);
+		break;
 	}
-
-	if (event.type == SDL_EVENT_PEN_MOTION) {
-		if (m_pressure > 0.0f) {
-			if (m_previous_touchX >= 0.0f) { // only draw if we're moving while touching
-				m_topLeftTextMessage = "Writing";
-				SDL_Log(m_topLeftTextMessage.c_str());
-			}
-
-			m_previous_touchX = event.pmotion.x;
-			m_previous_touchY = event.pmotion.y;
-		}
-		else {
-			m_previous_touchX = m_previous_touchY = -1.0f;
-		}
-	}
-	else if (event.type == SDL_EVENT_PEN_AXIS) {
-		if (event.paxis.axis == SDL_PEN_AXIS_PRESSURE) {
-			const float rawPressure = event.paxis.value;
-
-			m_pressure = (rawPressure == 0.0f) ? 0.0f : std::min(rawPressure + PRESSURE_OFFSET, 1.0f);
-
-			m_topLeftTextMessage = std::format(
-				"Actual pressure: {}, offset: {}, New Pressure: {}",
-				rawPressure, PRESSURE_OFFSET, m_pressure
-			);
-		}
-		else if (event.paxis.axis == SDL_PEN_AXIS_XTILT) {
-			m_tiltX = event.paxis.value;
-		}
-		else if (event.paxis.axis == SDL_PEN_AXIS_YTILT) {
-			m_tiltY = event.paxis.value;
-		}
+	case SDL_EVENT_WINDOW_EXPOSED:
+		this->update(); break;
+	case SDL_EVENT_PEN_MOTION:
+		this->procesPenMotion(event); break;
+	case SDL_EVENT_PEN_AXIS:
+		this->processPenAxis(event); break;
 	}
 
 	return SDL_APP_CONTINUE;
 }
 
 SDL_AppResult Application::update() {
-	int currentWidth, currentHeight;
-	SDL_GetWindowSizeInPixels(m_window.get(), &currentWidth, &currentHeight);
-
-	if (currentWidth != m_fbWidth || currentHeight != m_fbHeight) {
-		m_fbWidth = currentWidth;
-		m_fbHeight = currentHeight;
-		glViewport(0, 0, m_fbWidth, m_fbHeight);
+	Uint32 flags = SDL_GetWindowFlags(m_window.get());
+	if (flags & SDL_WINDOW_MINIMIZED) {
+		SDL_Delay(10); // Throttle loop
+		return SDL_APP_CONTINUE;
 	}
 
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	SDL_GL_SwapWindow(m_window.get());
 
 	return SDL_APP_CONTINUE;
+}
+
+void Application::procesPenMotion(const SDL_Event& event) {
+	if (m_pressure > 0.0f) {
+		if (m_previous_touchX >= 0.0f) { // only draw if we're moving while touching
+			m_topLeftTextMessage = "Writing";
+			SDL_Log(m_topLeftTextMessage.c_str());
+		}
+		m_previous_touchX = event.pmotion.x;
+		m_previous_touchY = event.pmotion.y;
+	}
+	else {
+		m_previous_touchX = m_previous_touchY = -1.0f;
+	}
+}
+
+void Application::processPenAxis(const SDL_Event& event) {
+	switch (event.paxis.axis) {
+	case SDL_PEN_AXIS_PRESSURE: {
+		const float rawPressure = event.paxis.value;
+
+		m_pressure = (rawPressure == 0.0f) ? 0.0f : std::min(rawPressure + PRESSURE_OFFSET, 1.0f);
+
+		m_topLeftTextMessage = std::format(
+			"Actual pressure: {}, offset: {}, New Pressure: {}",
+			rawPressure, PRESSURE_OFFSET, m_pressure
+		);
+		break;
+	}
+	case SDL_PEN_AXIS_XTILT:
+		m_tiltX = event.paxis.value; break;
+	case SDL_PEN_AXIS_YTILT:
+		m_tiltY = event.paxis.value; break;
+	}
 }

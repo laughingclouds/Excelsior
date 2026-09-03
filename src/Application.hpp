@@ -33,6 +33,9 @@ public:
 	SDL_AppResult update();
 
 private:
+	void procesPenMotion(const SDL_Event& event);
+	void processPenAxis(const SDL_Event& event);
+
 	UniqueWindow m_window;
 	UniqueGLContext m_glContext;
 
