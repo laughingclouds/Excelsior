@@ -35,6 +35,9 @@ public:
 private:
 	void procesPenMotion(const SDL_Event& event);
 	void processPenAxis(const SDL_Event& event);
+	
+	bool m_show_demo_window = true;
+	bool m_show_another_window = false;
 
 	UniqueWindow m_window;
 	UniqueGLContext m_glContext;

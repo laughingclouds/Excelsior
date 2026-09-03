@@ -9,6 +9,12 @@
 
 #include <SDL3/SDL.h>
 
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_opengl3.h>
+
+static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
 void SDLWindowDeleter::operator()(SDL_Window* w) const { if (w) SDL_DestroyWindow(w); }
 void GLContextDeleter::operator()(SDL_GLContext c) const {
 	if (c) {
@@ -32,6 +38,7 @@ Application::Application() {
 		throw std::runtime_error(std::format("Couldn't initialize SDL: {}", SDL_GetError()));
 	}
 
+	const char* glsl_version = "#version 430";
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -61,21 +68,43 @@ Application::Application() {
 	SDL_SetWindowPosition(m_window.get(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 	SDL_ShowWindow(m_window.get());
 
-	int version = gladLoadGL((GLADloadfunc) SDL_GL_GetProcAddress);
+	// setup imgui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	
+	// enable keyboard, gamepad controls
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+	// setup imgui style
+	ImGui::StyleColorsDark();
+
+	// setup scaling
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.ScaleAllSizes(main_scale);
+	style.FontScaleDpi = main_scale;
+
+	// setup platform/renderer backends
+	ImGui_ImplSDL3_InitForOpenGL(m_window.get(), m_glContext.get());
+	ImGui_ImplOpenGL3_Init(glsl_version);
+
+	SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
+
+	int version = gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
 	if (!version) {
 		throw std::runtime_error(std::format("Couldn't initialize OpenGL Context"));
 	}
 
 	SDL_Log("GL v%d.%d Initialized", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 
-
-	SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
-
 	// gray background
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
 }
 
 SDL_AppResult Application::handleEvent(const SDL_Event& event) {
+	ImGui_ImplSDL3_ProcessEvent(&event);
+
 	switch (event.type) {
 	case SDL_EVENT_QUIT:
 		return SDL_APP_SUCCESS;
@@ -98,13 +127,23 @@ SDL_AppResult Application::handleEvent(const SDL_Event& event) {
 }
 
 SDL_AppResult Application::update() {
-	Uint32 flags = SDL_GetWindowFlags(m_window.get());
-	if (flags & SDL_WINDOW_MINIMIZED) {
+	if (SDL_GetWindowFlags(m_window.get()) & SDL_WINDOW_MINIMIZED) {
 		SDL_Delay(10); // Throttle loop
 		return SDL_APP_CONTINUE;
 	}
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL3_NewFrame();
+	ImGui::NewFrame();
+
+	if (m_show_demo_window)
+		ImGui::ShowDemoWindow(&m_show_demo_window);
+
+	ImGui::Render();
+	ImGuiIO& io = ImGui::GetIO();
+	glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+	glClear(GL_COLOR_BUFFER_BIT);
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	SDL_GL_SwapWindow(m_window.get());
 
