@@ -126,29 +126,6 @@ SDL_AppResult Application::handleEvent(const SDL_Event& event) {
 	return SDL_APP_CONTINUE;
 }
 
-SDL_AppResult Application::update() {
-	if (SDL_GetWindowFlags(m_window.get()) & SDL_WINDOW_MINIMIZED) {
-		SDL_Delay(10); // Throttle loop
-		return SDL_APP_CONTINUE;
-	}
-
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL3_NewFrame();
-	ImGui::NewFrame();
-
-	if (m_show_demo_window)
-		ImGui::ShowDemoWindow(&m_show_demo_window);
-
-	ImGui::Render();
-	ImGuiIO& io = ImGui::GetIO();
-	glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-	glClear(GL_COLOR_BUFFER_BIT);
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	SDL_GL_SwapWindow(m_window.get());
-
-	return SDL_APP_CONTINUE;
-}
 
 void Application::procesPenMotion(const SDL_Event& event) {
 	if (m_pressure > 0.0f) {
@@ -182,4 +159,28 @@ void Application::processPenAxis(const SDL_Event& event) {
 	case SDL_PEN_AXIS_YTILT:
 		m_tiltY = event.paxis.value; break;
 	}
+}
+
+SDL_AppResult Application::update() {
+	if (SDL_GetWindowFlags(m_window.get()) & SDL_WINDOW_MINIMIZED) {
+		SDL_Delay(10); // Throttle loop
+		return SDL_APP_CONTINUE;
+	}
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL3_NewFrame();
+	ImGui::NewFrame();
+
+	if (m_show_demo_window)
+		ImGui::ShowDemoWindow(&m_show_demo_window);
+
+	ImGui::Render();
+	ImGuiIO& io = ImGui::GetIO();
+	glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+	glClear(GL_COLOR_BUFFER_BIT);
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	SDL_GL_SwapWindow(m_window.get());
+
+	return SDL_APP_CONTINUE;
 }
