@@ -32,6 +32,8 @@ target_sources(Excelsior
         "src/Stroke.hpp"
         "src/Window.cpp"
         "src/Window.hpp"
+        "src/ImGuiLayer.cpp"
+        "src/ImGuiLayer.hpp"
 )
 
 set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendored/imgui")
