@@ -27,7 +27,7 @@ find_package(OpenGL REQUIRED)
 
 target_sources(Excelsior
     PRIVATE
-        "src/glad.c"            # opengl loader source file
+        "src/gl.c"            # opengl loader source file
         "src/Application.cpp"
         "src/Application.hpp"
         "src/Stroke.cpp"

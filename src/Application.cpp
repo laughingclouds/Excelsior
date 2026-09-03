@@ -1,3 +1,5 @@
+#include <glad/gl.h>
+
 #include "Application.hpp"
 #include "Stroke.hpp"
 
@@ -50,24 +52,17 @@ Application::Application() {
 		throw std::runtime_error(std::format("Couldn't create GL Context for window: {}", SDL_GetError()));
 	}
 
-	// make render target match output size so drawing matches pen's position on tablet displays
-	m_renderTarget.reset(SDL_CreateTexture(
-		m_renderer.get(),
-		SDL_PIXELFORMAT_RGBA8888,
-		SDL_TEXTUREACCESS_TARGET,
-		w, h
-	));
-
-	if (!m_renderTarget) {
-		throw std::runtime_error(std::format("Couldn't create render target: {}", SDL_GetError()));
+	int version = gladLoadGL((GLADloadfunc) SDL_GL_GetProcAddress);
+	if (!version) {
+		throw std::runtime_error(std::format("Couldn't initialize OpenGL Context"));
 	}
 
-	// blank the render target to gray to start
-	SDL_SetRenderTarget(m_renderer.get(), m_renderTarget.get());
-	SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 0, SDL_ALPHA_OPAQUE);
-	SDL_RenderClear(m_renderer.get());
-	SDL_SetRenderTarget(m_renderer.get(), nullptr);
-	SDL_SetRenderDrawBlendMode(m_renderer.get(), SDL_BLENDMODE_BLEND);
+	// set framebuffer width, height
+	int w = 0, h = 0;
+	SDL_GetWindowSizeInPixels(m_window.get(), &w, &h);
+	glViewport(0, 0, w, h);
+
+	SDL_Log("GL v%d.%d Initialized", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 
 	SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 
@@ -83,9 +78,9 @@ SDL_AppResult Application::handleEvent(const SDL_Event& event) {
 		if (m_pressure > 0.0f) {
 			if (m_previous_touchX >= 0.0f) { // only draw if we're moving while touching
 				m_topLeftTextMessage = "Writing";
-				SDL_SetRenderTarget(m_renderer.get(), m_renderTarget.get());
-				SDL_SetRenderDrawColorFloat(m_renderer.get(), 1.0f, 1.0f, 1.0f, m_pressure);
-				SDL_RenderLine(m_renderer.get(), m_previous_touchX, m_previous_touchY, event.pmotion.x, event.pmotion.y);
+				//SDL_SetRenderTarget(m_renderer.get(), m_renderTarget.get());
+				//SDL_SetRenderDrawColorFloat(m_renderer.get(), 1.0f, 1.0f, 1.0f, m_pressure);
+				//SDL_RenderLine(m_renderer.get(), m_previous_touchX, m_previous_touchY, event.pmotion.x, event.pmotion.y);
 			}
 
 			m_previous_touchX = event.pmotion.x;
@@ -118,15 +113,10 @@ SDL_AppResult Application::handleEvent(const SDL_Event& event) {
 }
 
 SDL_AppResult Application::update() {
-	// make sure we're drawing to window and not render target
-	SDL_SetRenderTarget(m_renderer.get(), nullptr);
-	// non-drawing surface to be gray to distinguish
-	SDL_SetRenderDrawColor(m_renderer.get(), 100, 100, 100, SDL_ALPHA_OPAQUE);
-	SDL_RenderClear(m_renderer.get());
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	SDL_RenderTexture(m_renderer.get(), m_renderTarget.get(), nullptr, nullptr);
-	SDL_RenderDebugText(m_renderer.get(), 0, 8, m_topLeftTextMessage.c_str());
-	SDL_RenderPresent(m_renderer.get());
+	SDL_GL_SwapWindow(m_window.get());
 
 	return SDL_APP_CONTINUE;
 }
