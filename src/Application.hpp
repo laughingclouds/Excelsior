@@ -1,22 +1,17 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 
 // SDL forward declarations
 struct SDL_Window;
-struct SDL_Renderer;
-struct SDL_Texture;
+struct SDL_GLContextState;
+typedef SDL_GLContextState* SDL_GLContext;
 union SDL_Event;
 enum SDL_AppResult;
 
-struct SDLWindowDeleter { void operator()(SDL_Window* w) const; };
-struct SDLRendererDeleter { void operator()(SDL_Renderer* r) const; };
-struct SDLTextureDeleter { void operator()(SDL_Texture* t) const; };
-
-using UniqueWindow = std::unique_ptr<SDL_Window, SDLWindowDeleter>;
-using UniqueRenderer = std::unique_ptr<SDL_Renderer, SDLRendererDeleter>;
-using UniqueTexture = std::unique_ptr<SDL_Texture, SDLTextureDeleter>;
+using UniqueGLContext = std::unique_ptr<SDL_GLContextState, std::function<void(SDL_GLContext)>>;
 
 class Application {
 public:
@@ -35,9 +30,8 @@ public:
 	SDL_AppResult update();
 
 private:
-	UniqueWindow m_window;
-	UniqueRenderer m_renderer;
-	UniqueTexture m_renderTarget;
+	std::shared_ptr<SDL_Window> m_window;
+	UniqueGLContext m_glContext;
 
 	float m_previous_touchX = -1.0f;
 	float m_previous_touchY = -1.0f;

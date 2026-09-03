@@ -7,11 +7,6 @@
 
 #include <SDL3/SDL.h>
 
-// custom deleters for unique pointers
-void SDLWindowDeleter::operator()(SDL_Window* w) const { SDL_DestroyWindow(w); }
-void SDLRendererDeleter::operator()(SDL_Renderer* r) const { SDL_DestroyRenderer(r); }
-void SDLTextureDeleter::operator()(SDL_Texture* t) const { SDL_DestroyTexture(t); }
-
 Application::Application() {
 	SDL_SetAppMetadata("Excelsior", "0.1", "com.github.laughingclouds");
 
@@ -25,18 +20,35 @@ Application::Application() {
 		throw std::runtime_error(std::format("Couldn't initialize SDL: {}", SDL_GetError()));
 	}
 
-	SDL_Window* window = nullptr;
-	SDL_Renderer* renderer = nullptr;
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	if (!SDL_CreateWindowAndRenderer("Excelsior", WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer)) {
+	m_window = std::shared_ptr<SDL_Window>(
+		SDL_CreateWindow("Excelsior", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL),
+		SDL_DestroyWindow
+	);
+	if (!m_window) {
 		throw std::runtime_error(std::format("Couldn't create window/renderer: {}", SDL_GetError()));
 	}
 
-	m_window.reset(window);
-	m_renderer.reset(renderer);
+	std::shared_ptr<SDL_Window> windowRef = m_window;
 
-	int w = 0, h = 0;
-	SDL_GetRenderOutputSize(m_renderer.get(), &w, &h);
+	m_glContext = std::unique_ptr<SDL_GLContextState, std::function<void(SDL_GLContext)>>(
+		SDL_GL_CreateContext(windowRef.get()),
+		[windowRef](SDL_GLContext c) {
+			if (c) {
+				// windowRef keeps SDL_Window alive
+				SDL_GL_MakeCurrent(windowRef.get(), nullptr);
+				SDL_GL_DestroyContext(c);
+			}
+		}
+	);
+	//m_glContext.reset(SDL_GL_CreateContext(m_window.get()));
+	if (!m_glContext) {
+		throw std::runtime_error(std::format("Couldn't create GL Context for window: {}", SDL_GetError()));
+	}
 
 	// make render target match output size so drawing matches pen's position on tablet displays
 	m_renderTarget.reset(SDL_CreateTexture(
