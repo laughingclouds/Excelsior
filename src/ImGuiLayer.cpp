@@ -43,4 +43,38 @@ namespace excelsior {
 			throw std::runtime_error("Couldn't initialize ImGui OpenGL backend");
 		}
 	}
+
+	ImGuiLayer::~ImGuiLayer() {
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplSDL3_Shutdown();
+		ImGui::DestroyContext();
+	}
+
+	void ImGuiLayer::processEvent(const SDL_Event& event) {
+		ImGui_ImplSDL3_ProcessEvent(&event);
+	}
+
+	void ImGuiLayer::beginFrame() {
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL3_NewFrame();
+
+		ImGui::NewFrame();
+	}
+
+	void ImGuiLayer::render(const std::array<float, 4>& clearColor) {
+		ImGui::Render();
+
+		const auto [width, height] = m_window.framebufferSize();
+		glViewport(0, 0, width, height);
+		glClearColor(
+			clearColor[0] * clearColor[3],
+			clearColor[1] * clearColor[3],
+			clearColor[2] * clearColor[3],
+			clearColor[3]
+		);
+
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
 }
