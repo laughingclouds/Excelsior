@@ -17,7 +17,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 
 
-add_subdirectory(vendored/SDL EXCLUDE_FROM_ALL)
+add_subdirectory("vendored/SDL" EXCLUDE_FROM_ALL)
 
 # Add source to this project's executable.
 add_executable (Excelsior WIN32 "src/Excelsior.cpp")
@@ -28,6 +28,11 @@ target_sources(Excelsior
         "src/Application.hpp"
         "src/Stroke.cpp"
         "src/Stroke.hpp"
+)
+
+target_include_directories(Excelsior
+    PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 
 target_link_libraries(Excelsior PRIVATE SDL3::SDL3)
