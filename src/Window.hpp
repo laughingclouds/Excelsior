@@ -9,6 +9,13 @@ namespace excelsior {
 class Window {
 public:
 	Window(const char* title, int width, int height);
+	~Window();
+
+	Window(const Window&) = delete;
+	Window& operator=(const Window&) = delete;
+	Window(Window&&) = delete;
+	Window& operator=(Window&&) = delete;
+
 private:
 	struct SDLWindowDeleter { void operator()(SDL_Window* w) const noexcept; };
 	struct GLContextDeleter { void operator()(SDL_GLContextState* c) const noexcept; };
