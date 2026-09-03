@@ -1,6 +1,5 @@
 #pragma once
 
-#include <functional>
 #include <memory>
 #include <string>
 
@@ -11,12 +10,16 @@ typedef SDL_GLContextState* SDL_GLContext;
 union SDL_Event;
 enum SDL_AppResult;
 
-using UniqueGLContext = std::unique_ptr<SDL_GLContextState, std::function<void(SDL_GLContext)>>;
+struct SDLWindowDeleter { void operator()(SDL_Window* w) const; };
+struct GLContextDeleter { void operator()(SDL_GLContext c) const; };
+
+using UniqueWindow = std::unique_ptr<SDL_Window, SDLWindowDeleter>;
+using UniqueGLContext = std::unique_ptr<SDL_GLContextState, GLContextDeleter>;
 
 class Application {
 public:
-	static constexpr int WINDOW_WIDTH = 640;
-	static constexpr int WINDOW_HEIGHT = 480;
+	static constexpr int WINDOW_WIDTH = 1280;
+	static constexpr int WINDOW_HEIGHT = 800;
 	static constexpr float PRESSURE_OFFSET = 0.5f;
 	
 	/* Initialize Application + (window, renderer, texture)
@@ -30,7 +33,7 @@ public:
 	SDL_AppResult update();
 
 private:
-	std::shared_ptr<SDL_Window> m_window;
+	UniqueWindow m_window;
 	UniqueGLContext m_glContext;
 
 	// viewport pixels dimension

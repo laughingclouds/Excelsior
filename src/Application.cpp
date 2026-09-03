@@ -9,6 +9,14 @@
 
 #include <SDL3/SDL.h>
 
+void SDLWindowDeleter::operator()(SDL_Window* w) const { if (w) SDL_DestroyWindow(w); }
+void GLContextDeleter::operator()(SDL_GLContext c) const {
+	if (c) {
+		SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), nullptr);
+		SDL_GL_DestroyContext(c);
+	}
+}
+
 Application::Application() {
 	SDL_SetAppMetadata("Excelsior", "0.1", "com.github.laughingclouds");
 
@@ -27,30 +35,29 @@ Application::Application() {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	m_window = std::shared_ptr<SDL_Window>(
-		SDL_CreateWindow("Excelsior", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL),
-		SDL_DestroyWindow
-	);
+	// following https://github.com/ocornut/imgui/blob/master/examples/example_sdl3_opengl3/main.cpp
+	// create window with graphics context
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+	
+	float main_scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+	
+	SDL_WindowFlags window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY;
+
+	m_window.reset(SDL_CreateWindow("Excelsior", (int) (WINDOW_WIDTH * main_scale), (int) (WINDOW_HEIGHT * main_scale), window_flags));
 	if (!m_window) {
 		throw std::runtime_error(std::format("Couldn't create window/renderer: {}", SDL_GetError()));
 	}
 
-	std::shared_ptr<SDL_Window> windowRef = m_window;
-
-	m_glContext = std::unique_ptr<SDL_GLContextState, std::function<void(SDL_GLContext)>>(
-		SDL_GL_CreateContext(windowRef.get()),
-		[windowRef](SDL_GLContext c) {
-			if (c) {
-				// windowRef keeps SDL_Window alive
-				SDL_GL_MakeCurrent(windowRef.get(), nullptr);
-				SDL_GL_DestroyContext(c);
-			}
-		}
-	);
-	//m_glContext.reset(SDL_GL_CreateContext(m_window.get()));
+	m_glContext.reset(SDL_GL_CreateContext(m_window.get()));
 	if (!m_glContext) {
 		throw std::runtime_error(std::format("Couldn't create GL Context for window: {}", SDL_GetError()));
 	}
+
+	SDL_GL_MakeCurrent(m_window.get(), m_glContext.get());
+	SDL_GL_SetSwapInterval(1); // Enable vsync
+	SDL_SetWindowPosition(m_window.get(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+	SDL_ShowWindow(m_window.get());
 
 	int version = gladLoadGL((GLADloadfunc) SDL_GL_GetProcAddress);
 	if (!version) {
