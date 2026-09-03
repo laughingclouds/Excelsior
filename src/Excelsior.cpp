@@ -37,5 +37,9 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
 
 /* Runs once at shutdown */
 void SDL_AppQuit(void *appstate, SDL_AppResult result){
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL3_Shutdown();
+	ImGui::DestroyContext();
+
 	delete static_cast<Application*>(appstate);
 }
