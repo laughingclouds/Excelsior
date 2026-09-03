@@ -38,6 +38,8 @@ private:
 
 	void anotherWindow();
 
+	void topLeftOverlay(bool* p_open = nullptr);
+
 	void procesPenMotion(const SDL_Event& event);
 	void processPenAxis(const SDL_Event& event);
 	
