@@ -21,8 +21,6 @@ add_subdirectory("vendored/SDL" EXCLUDE_FROM_ALL)
 # Add source to this project's executable.
 add_executable (Excelsior WIN32 "src/Excelsior.cpp")
 
-target_include_directories(Excelsior PRIVATE include)
-
 find_package(OpenGL REQUIRED)
 
 target_sources(Excelsior
@@ -34,9 +32,31 @@ target_sources(Excelsior
         "src/Stroke.hpp"
 )
 
+set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendored/imgui")
+
+target_sources(Excelsior
+    PRIVATE
+        # Core files
+        "${IMGUI_DIR}/imgui.cpp"
+        "${IMGUI_DIR}/imgui.h"
+        "${IMGUI_DIR}/imgui_demo.cpp"
+        "${IMGUI_DIR}/imgui_draw.cpp"
+        "${IMGUI_DIR}/imgui_internal.h"
+        "${IMGUI_DIR}/imgui_tables.cpp"
+        "${IMGUI_DIR}/imgui_widgets.cpp"
+        # Backends
+        "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
+        "${IMGUI_DIR}/backends/imgui_impl_opengl3.h"
+        "${IMGUI_DIR}/backends/imgui_impl_sdl3.cpp"
+        "${IMGUI_DIR}/backends/imgui_impl_sdl3.h"
+)
+
 target_include_directories(Excelsior
     PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
+        "${IMGUI_DIR}"
+        "${IMGUI_DIR}/backends"
 )
 
 target_link_libraries(Excelsior
