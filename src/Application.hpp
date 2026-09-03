@@ -33,6 +33,9 @@ public:
 	SDL_AppResult update();
 
 private:
+	/* A simple hello world window created by imgui */
+	void imguiHelloWorld();
+
 	void procesPenMotion(const SDL_Event& event);
 	void processPenAxis(const SDL_Event& event);
 	

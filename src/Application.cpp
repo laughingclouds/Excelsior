@@ -14,6 +14,7 @@
 #include <imgui_impl_opengl3.h>
 
 static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+static bool clear_color_changed = false;
 
 void SDLWindowDeleter::operator()(SDL_Window* w) const { if (w) SDL_DestroyWindow(w); }
 void GLContextDeleter::operator()(SDL_GLContext c) const {
@@ -174,13 +175,46 @@ SDL_AppResult Application::update() {
 	if (m_show_demo_window)
 		ImGui::ShowDemoWindow(&m_show_demo_window);
 
+	this->imguiHelloWorld();
+
 	ImGui::Render();
 	ImGuiIO& io = ImGui::GetIO();
 	glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+	if (clear_color_changed) {
+		clear_color_changed = false;
+		glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+	}
 	glClear(GL_COLOR_BUFFER_BIT);
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	SDL_GL_SwapWindow(m_window.get());
 
 	return SDL_APP_CONTINUE;
+}
+
+void Application::imguiHelloWorld() {
+	ImGuiIO& io = ImGui::GetIO();
+	static float f = 0.0f;
+	static int counter = 0;
+
+	// Begin/End pair creates a named window
+	ImGui::Begin("Hello World!");
+
+	ImGui::Text(m_topLeftTextMessage.c_str());
+	ImGui::Checkbox("Demo Window", &m_show_demo_window);
+	ImGui::Checkbox("Another Window", &m_show_another_window);
+
+	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+	if (ImGui::ColorEdit3("Clear color", (float*)&clear_color)) {
+		clear_color_changed = true;
+	}
+
+	if (ImGui::Button("Button"))
+		counter++;
+
+	ImGui::SameLine();
+	ImGui::Text("counter = %d", counter);
+
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+	ImGui::End();
 }
