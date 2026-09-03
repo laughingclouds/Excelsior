@@ -57,11 +57,6 @@ Application::Application() {
 		throw std::runtime_error(std::format("Couldn't initialize OpenGL Context"));
 	}
 
-	// set framebuffer width, height
-	int w = 0, h = 0;
-	SDL_GetWindowSizeInPixels(m_window.get(), &w, &h);
-	glViewport(0, 0, w, h);
-
 	SDL_Log("GL v%d.%d Initialized", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 
 	SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
@@ -74,13 +69,17 @@ SDL_AppResult Application::handleEvent(const SDL_Event& event) {
 		return SDL_APP_SUCCESS;
 	}
 
+	if (event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
+		m_fbWidth = event.window.data1;
+		m_fbHeight = event.window.data2;
+		glViewport(0, 0, m_fbWidth, m_fbHeight);
+	}
+
 	if (event.type == SDL_EVENT_PEN_MOTION) {
 		if (m_pressure > 0.0f) {
 			if (m_previous_touchX >= 0.0f) { // only draw if we're moving while touching
 				m_topLeftTextMessage = "Writing";
-				//SDL_SetRenderTarget(m_renderer.get(), m_renderTarget.get());
-				//SDL_SetRenderDrawColorFloat(m_renderer.get(), 1.0f, 1.0f, 1.0f, m_pressure);
-				//SDL_RenderLine(m_renderer.get(), m_previous_touchX, m_previous_touchY, event.pmotion.x, event.pmotion.y);
+				SDL_Log(m_topLeftTextMessage.c_str());
 			}
 
 			m_previous_touchX = event.pmotion.x;
@@ -113,6 +112,15 @@ SDL_AppResult Application::handleEvent(const SDL_Event& event) {
 }
 
 SDL_AppResult Application::update() {
+	int currentWidth, currentHeight;
+	SDL_GetWindowSizeInPixels(m_window.get(), &currentWidth, &currentHeight);
+
+	if (currentWidth != m_fbWidth || currentHeight != m_fbHeight) {
+		m_fbWidth = currentWidth;
+		m_fbHeight = currentHeight;
+		glViewport(0, 0, m_fbWidth, m_fbHeight);
+	}
+
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

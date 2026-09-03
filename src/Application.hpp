@@ -33,6 +33,10 @@ private:
 	std::shared_ptr<SDL_Window> m_window;
 	UniqueGLContext m_glContext;
 
+	// viewport pixels dimension
+	int m_fbWidth = WINDOW_WIDTH;
+	int m_fbHeight = WINDOW_HEIGHT;
+
 	float m_previous_touchX = -1.0f;
 	float m_previous_touchY = -1.0f;
 	float m_pressure = 0.0f;
