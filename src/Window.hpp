@@ -15,6 +15,23 @@ public:
 	Window& operator=(const Window&) = delete;
 	Window(Window&&) = delete;
 	Window& operator=(Window&&) = delete;
+	
+	[[nodiscard]]
+	SDL_Window* nativeHandle() const noexcept;
+
+	[[nodiscard]]
+	SDL_GLContext glContext() const noexcept;
+
+	[[nodiscard]]
+	float contentScale() const noexcept;
+
+	[[nodiscard]]
+	bool isMinimized() const noexcept;
+
+	[[nodiscard]]
+	std::pair<int, int> framebufferSize() const noexcept;
+
+	void swapBuffers() const;
 
 private:
 	struct SDLWindowDeleter { void operator()(SDL_Window* w) const noexcept; };

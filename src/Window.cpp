@@ -65,4 +65,42 @@ namespace excelsior {
 		SDL_SetWindowPosition(m_window.get(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		SDL_ShowWindow(m_window.get()); // since we initialized in hidden state
 	}
+
+	Window::~Window() {
+		// context should stop being current before it is destroyed
+		if (m_window && m_glContext)
+			SDL_GL_MakeCurrent(m_window.get(), nullptr);
+
+		// members will be destroyed in reverse declaration order
+		// m_glContext
+		// m_window
+	}
+
+	SDL_Window* Window::nativeHandle() const noexcept {
+		return m_window.get();
+	}
+
+	SDL_GLContext Window::glContext() const noexcept {
+		return m_glContext.get();
+	}
+
+	float Window::contentScale() const noexcept {
+		return m_contentScale;
+	}
+
+	bool Window::isMinimized() const noexcept {
+		return SDL_GetWindowFlags(m_window.get()) & SDL_WINDOW_MINIMIZED;
+	}
+
+	std::pair<int, int> Window::framebufferSize() const noexcept {
+		int width = 0, height = 0;
+
+		SDL_GetWindowSizeInPixels(m_window.get(), &width, &height);
+
+		return { width, height };
+	}
+
+	void Window::swapBuffers() const {
+		SDL_GL_SwapWindow(m_window.get());
+	}
 }
