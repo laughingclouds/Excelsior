@@ -21,8 +21,13 @@ add_subdirectory("vendored/SDL" EXCLUDE_FROM_ALL)
 # Add source to this project's executable.
 add_executable (Excelsior WIN32 "src/Excelsior.cpp")
 
+target_include_directories(Excelsior PRIVATE include)
+
+find_package(OpenGL REQUIRED)
+
 target_sources(Excelsior
     PRIVATE
+        "src/glad.c"            # opengl loader source file
         "src/Application.cpp"
         "src/Application.hpp"
         "src/Stroke.cpp"
@@ -34,7 +39,11 @@ target_include_directories(Excelsior
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 
-target_link_libraries(Excelsior PRIVATE SDL3::SDL3)
+target_link_libraries(Excelsior
+    PRIVATE
+        SDL3::SDL3
+        OpenGL::GL
+)
 
 target_compile_features(Excelsior PRIVATE cxx_std_20)
 set_target_properties(Excelsior PROPERTIES 
