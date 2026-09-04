@@ -95,41 +95,33 @@ SDL_AppResult Application::handleEvent(const SDL_Event& event) {
 }
 
 SDL_AppResult Application::update() {
-	if (SDL_GetWindowFlags(m_window.get()) & SDL_WINDOW_MINIMIZED) {
+
+		if (m_window.isMinimized()) {
 		SDL_Delay(10); // Throttle loop
 		return SDL_APP_CONTINUE;
 	}
 
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL3_NewFrame();
-	ImGui::NewFrame();
+		m_imgui.beginFrame();
 
-	if (m_show_demo_window)
-		ImGui::ShowDemoWindow(&m_show_demo_window);
+		drawUi();
 
-	this->imguiHelloWorld();
-
-	if (m_show_another_window)
-		this->anotherWindow();
-
-	this->topLeftOverlay();
-
-	ImGui::Render();
-	ImGuiIO& io = ImGui::GetIO();
-	glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-	if (clear_color_changed) {
-		clear_color_changed = false;
-		glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-	}
-	glClear(GL_COLOR_BUFFER_BIT);
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	SDL_GL_SwapWindow(m_window.get());
+		m_imgui.render(m_clearColor);
+		m_window.swapBuffers();
 
 	return SDL_APP_CONTINUE;
 }
 
-void Application::imguiHelloWorld() {
+	void Application::drawUi() {
+		if (m_showDemoWindow)
+			ImGui::ShowDemoWindow(&m_showDemoWindow);
+
+		showHelloWorldWindow();
+
+		if (m_showAnotherWindow)
+			showAnotherWindow();
+
+		showTopLeftOverlay();
+	}
 	ImGuiIO& io = ImGui::GetIO();
 	static float f = 0.0f;
 	static int counter = 0;
