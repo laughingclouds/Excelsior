@@ -27,6 +27,7 @@ namespace excelsior {
 
 		switch (event.type) {
 		case SDL_EVENT_QUIT:
+		case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
 			return SDL_APP_SUCCESS;
 
 		case SDL_EVENT_WINDOW_EXPOSED:
