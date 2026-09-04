@@ -44,7 +44,7 @@ public:
 	// call either maximize or restore
 	bool toggleMaximize();
 
-	void setWindowChromeHitTest(float titleBarHeight, float captionButtonWidth, float resizeBorderThickness);
+	void configureChromeHitTest(float titleBarHeight, float captionButtonWidth, float resizeBorderThickness);
 
 private:
 	static SDL_HitTestResult SDLCALL hitTest(SDL_Window* window, const SDL_Point* point, void* data);

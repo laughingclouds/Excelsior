@@ -77,15 +77,21 @@ namespace excelsior {
 	}
 
 	void Application::drawWindowChrome() {
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+		const float chromeHeight = ImGui::GetFrameHeight();
+
+		const float btnWidth = chromeHeight * 2.5;
+		const float btnHeight = chromeHeight;
+		const float captionButtonsWidth = 3.0f * btnWidth;
+
+		// native window behavior using chrome dimensions
+		m_window.configureChromeHitTest(chromeHeight, captionButtonsWidth, m_resizeBorderThickness);
+		
 		// strip padding, border, minimum restriction
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0.0f, 0.0f));
-
-		const ImGuiViewport* viewport = ImGui::GetMainViewport();
-		const float width = viewport->Size.x;
-
-		const float chromeHeight = ImGui::GetFrameHeight();
 
 		ImGui::SetNextWindowPos(viewport->Pos, ImGuiCond_Always);
 		ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, chromeHeight), ImGuiCond_Always);
@@ -101,19 +107,13 @@ namespace excelsior {
 		// Title bar
 		const float textLineHeight = ImGui::GetTextLineHeight();
 		const float textY = (chromeHeight - textLineHeight) * 0.5f;
-
 		ImGui::SetCursorPos(ImVec2(
-			8.0f,
-			(chromeHeight - textLineHeight) * 0.5f
+			8.0f, // space on left side of text
+			textY // Y coordinate at middle of imgui window
 		));
 		ImGui::TextUnformatted("Excelsior");
 
 		// Window buttons
-		const float btnWidth = chromeHeight * 2.5;
-		const float btnHeight = chromeHeight;
-
-		// Make window chrome draggable
-		m_window.setWindowChromeHitTest(chromeHeight, 3.0f * btnWidth, m_resizeBorderThickness);
 
 		// right most edge of current window (window chrome)
 		const float right = ImGui::GetWindowWidth();

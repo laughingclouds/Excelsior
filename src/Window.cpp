@@ -130,7 +130,7 @@ namespace excelsior {
 		return maximize();
 	}
 
-	void Window::setWindowChromeHitTest(float titleBarHeight, float captionButtonsWidth, float resizeBorderThickness) {
+	void Window::configureChromeHitTest(float titleBarHeight, float captionButtonsWidth, float resizeBorderThickness) {
 		m_titleBarHeight = titleBarHeight;
 		m_captionButtonsWidth = captionButtonsWidth;
 		m_resizeBorderThickness = resizeBorderThickness;
