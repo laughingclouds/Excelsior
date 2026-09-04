@@ -28,6 +28,7 @@ public:
 	[[nodiscard]]
 	bool isMinimized() const noexcept;
 
+	// Return { width, height }
 	[[nodiscard]]
 	std::pair<int, int> framebufferSize() const noexcept;
 

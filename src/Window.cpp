@@ -27,10 +27,14 @@ namespace excelsior {
 		if (m_contentScale <= 0.0f)
 			m_contentScale = 1.0f;
 
+		// Known issue with borderless
+		// https://github.com/libsdl-org/SDL/issues/12791
+		// SDL3: OpenGL Borderless Window Becomes Exclusive Fullscreen on SDL_GL_SwapWindow (Windows 11)
 		const SDL_WindowFlags flags =
 			SDL_WINDOW_OPENGL |
 			SDL_WINDOW_RESIZABLE |
 			SDL_WINDOW_HIDDEN |
+			//SDL_WINDOW_BORDERLESS |
 			SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
 		m_window.reset(

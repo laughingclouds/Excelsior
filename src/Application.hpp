@@ -29,6 +29,9 @@ namespace excelsior {
 	private:
 		void drawUi();
 
+		// Custom window chrome
+		void drawWindowChrome();
+
 		/* A simple hello world window created by imgui */
 		void showHelloWorldWindow();
 		void showAnotherWindow();
@@ -47,6 +50,8 @@ namespace excelsior {
 
 		bool m_showDemoWindow = true;
 		bool m_showAnotherWindow = false;
+
+		bool m_shouldQuit = false;
 
 		std::string m_topLeftTextMessage;
 	};

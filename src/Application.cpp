@@ -54,10 +54,16 @@ namespace excelsior {
 		m_imgui.render(m_clearColor);
 		m_window.swapBuffers();
 
+		if (m_shouldQuit) {
+			return SDL_APP_SUCCESS;
+		}
+
 		return SDL_APP_CONTINUE;
 	}
 
 	void Application::drawUi() {
+		drawWindowChrome();
+
 		if (m_showDemoWindow)
 			ImGui::ShowDemoWindow(&m_showDemoWindow);
 
@@ -69,6 +75,64 @@ namespace excelsior {
 		showTopLeftOverlay();
 	}
 
+	void Application::drawWindowChrome() {
+		// strip padding, border, minimum restriction
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0.0f, 0.0f));
+
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+		const float width = viewport->Size.x;
+
+		const float chromeHeight = ImGui::GetFrameHeight();
+
+		ImGui::SetNextWindowPos(viewport->Pos, ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, chromeHeight), ImGuiCond_Always);
+
+		ImGui::Begin("Excelsior###MainWindowChrome",
+			nullptr,
+			ImGuiWindowFlags_NoDecoration |
+			ImGuiWindowFlags_NoMove |
+			//ImGuiWindowFlags_NoBackground |
+			ImGuiWindowFlags_NoSavedSettings
+			);
+
+		// Title bar
+		const float textLineHeight = ImGui::GetTextLineHeight();
+		const float textY = (chromeHeight - textLineHeight) * 0.5f;
+
+		ImGui::SetCursorPos(ImVec2(
+			8.0f,
+			(chromeHeight - textLineHeight) * 0.5f
+		));
+		ImGui::TextUnformatted("Excelsior");
+
+		// Window buttons
+		const float btnWidth = chromeHeight * 2.5;
+		const float btnHeight = chromeHeight;
+		// right most edge of current window (window chrome)
+		const float right = ImGui::GetWindowWidth();
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)); // invisible bg
+
+		ImGui::SetCursorPos(ImVec2(right - 3.0f * btnWidth, 0.0f));
+		ImGui::Button("_###MinimizeApp", ImVec2(btnWidth, btnHeight));
+
+		ImGui::SetCursorPos(ImVec2(right - 2.0f * btnWidth, 0.0f));
+		ImGui::Button("[]###MaximizeApp", ImVec2(btnWidth, btnHeight));
+
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.0f, 0.0f, 0.70f)); // red on hover
+		ImGui::SetCursorPos(ImVec2(right - btnWidth, 0.0f));
+		if (ImGui::Button("X###QuitApp", ImVec2(btnWidth, btnHeight))) {
+			m_shouldQuit = true;
+		}
+
+		ImGui::PopStyleColor(2);
+
+		ImGui::End();
+		ImGui::PopStyleVar(3);
+	}
+
 	void Application::showHelloWorldWindow() {
 		ImGuiIO& io = ImGui::GetIO();
 		static float f = 0.0f;
@@ -76,21 +140,21 @@ namespace excelsior {
 
 		// Begin/End pair creates a named window
 		if (ImGui::Begin("Hello World!")) {
-		ImGui::Text(m_topLeftTextMessage.c_str());
-		ImGui::Checkbox("Demo Window", &m_showDemoWindow);
-		ImGui::Checkbox("Another Window", &m_showAnotherWindow);
+			ImGui::Text(m_topLeftTextMessage.c_str());
+			ImGui::Checkbox("Demo Window", &m_showDemoWindow);
+			ImGui::Checkbox("Another Window", &m_showAnotherWindow);
 
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-		ImGui::ColorEdit3("Clear color", m_clearColor.data());
+			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+			ImGui::ColorEdit3("Clear color", m_clearColor.data());
 
-		if (ImGui::Button("Button"))
-			counter++;
+			if (ImGui::Button("Button"))
+				counter++;
 
-		ImGui::SameLine();
+			ImGui::SameLine();
 
-		ImGui::Text("counter = %d", counter);
+			ImGui::Text("counter = %d", counter);
 
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 		}
 
 		ImGui::End();
@@ -98,9 +162,9 @@ namespace excelsior {
 
 	void Application::showAnotherWindow() {
 		if (ImGui::Begin("Another Window", &m_showAnotherWindow)) {
-		ImGui::Text("Hello from another window!");
-		if (ImGui::Button("Close me"))
-			m_showAnotherWindow = false;
+			ImGui::Text("Hello from another window!");
+			if (ImGui::Button("Close me"))
+				m_showAnotherWindow = false;
 		}
 		ImGui::End();
 	}
