@@ -5,7 +5,7 @@
 namespace excelsior {
 	void PenInput::processEvent(const SDL_Event& event) {
 		switch (event.type) {
-		case SDL_EVENT_MOUSE_MOTION:
+		case SDL_EVENT_PEN_MOTION:
 			processMotion(event); break;
 		case SDL_EVENT_PEN_AXIS:
 			processAxis(event); break;
