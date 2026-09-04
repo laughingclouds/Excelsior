@@ -1,63 +1,54 @@
 #pragma once
 
-#include <memory>
+#include "ImGuiLayer.hpp"
+#include "PenInput.hpp"
+#include "Window.hpp"
+
+#include <array>
 #include <string>
 
-// SDL forward declarations
-struct SDL_Window;
-struct SDL_GLContextState;
-typedef SDL_GLContextState* SDL_GLContext;
-union SDL_Event;
-enum SDL_AppResult;
+#include <SDL3/SDL.h>
 
-struct SDLWindowDeleter { void operator()(SDL_Window* w) const; };
-struct GLContextDeleter { void operator()(SDL_GLContext c) const; };
+namespace excelsior {
 
-using UniqueWindow = std::unique_ptr<SDL_Window, SDLWindowDeleter>;
-using UniqueGLContext = std::unique_ptr<SDL_GLContextState, GLContextDeleter>;
-
-class Application {
-public:
-	static constexpr int WINDOW_WIDTH = 1280;
-	static constexpr int WINDOW_HEIGHT = 800;
-	static constexpr float PRESSURE_OFFSET = 0.5f;
+	class Application {
+	public:
+		static constexpr int WINDOW_WIDTH = 1280;
+		static constexpr int WINDOW_HEIGHT = 800;
 	
-	/* Initialize Application + (window, renderer, texture)
-	To be called in SDL_AppInit*/
-	Application();
+		/* Initialize Application + (window, renderer, texture)
+		To be called in SDL_AppInit*/
+		Application();
 
-	// Call within SDL_AppEvent
-	SDL_AppResult handleEvent(const SDL_Event& event);
+		// Call within SDL_AppEvent
+		SDL_AppResult handleEvent(const SDL_Event& event);
 
-	// Call within SDL_AppIterate
-	SDL_AppResult update();
+		// Call within SDL_AppIterate
+		SDL_AppResult update();
 
-private:
-	/* A simple hello world window created by imgui */
-	void imguiHelloWorld();
+	private:
+		void drawUi();
 
-	void anotherWindow();
+		/* A simple hello world window created by imgui */
+		void showHelloWorldWindow();
+		void showAnotherWindow();
+		void showTopLeftOverlay(bool* p_open = nullptr);
+		
+		Window m_window;
+		ImGuiLayer m_imgui;
+		PenInput m_penInput;
 
-	void topLeftOverlay(bool* p_open = nullptr);
+		std::array<float, 4> m_clearColor{
+			0.45f,	// r
+			0.55f,	// g
+			0.60f,	// b
+			1.00f	// a
+		};
 
-	void procesPenMotion(const SDL_Event& event);
-	void processPenAxis(const SDL_Event& event);
-	
-	bool m_show_demo_window = true;
-	bool m_show_another_window = false;
+		bool m_showDemoWindow = true;
+		bool m_showAnotherWindow = false;
 
-	UniqueWindow m_window;
-	UniqueGLContext m_glContext;
+		std::string m_topLeftTextMessage;
+	};
 
-	// viewport pixels dimension
-	int m_fbWidth = WINDOW_WIDTH;
-	int m_fbHeight = WINDOW_HEIGHT;
-
-	float m_previous_touchX = -1.0f;
-	float m_previous_touchY = -1.0f;
-	float m_pressure = 0.0f;
-	float m_tiltX = 0.0f;
-	float m_tiltY = 0.0f;
-
-	std::string m_topLeftTextMessage;
-};
+}
