@@ -15,6 +15,10 @@ public:
 	Window& operator=(const Window&) = delete;
 	Window(Window&&) = delete;
 	Window& operator=(Window&&) = delete;
+
+	bool minimize();
+	bool maximize();
+	bool restore();
 	
 	[[nodiscard]]
 	SDL_Window* nativeHandle() const noexcept;
@@ -28,11 +32,17 @@ public:
 	[[nodiscard]]
 	bool isMinimized() const noexcept;
 
+	[[nodiscard]]
+	bool isMaximized() const noexcept;
+
 	// Return { width, height }
 	[[nodiscard]]
 	std::pair<int, int> framebufferSize() const noexcept;
 
 	void swapBuffers() const;
+
+	// call either maximize or restore
+	bool toggleMaximize();
 
 private:
 	struct SDLWindowDeleter { void operator()(SDL_Window* w) const noexcept; };

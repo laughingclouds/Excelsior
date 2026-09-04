@@ -116,10 +116,14 @@ namespace excelsior {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)); // invisible bg
 
 		ImGui::SetCursorPos(ImVec2(right - 3.0f * btnWidth, 0.0f));
-		ImGui::Button("_###MinimizeApp", ImVec2(btnWidth, btnHeight));
+		if (ImGui::Button("_###MinimizeApp", ImVec2(btnWidth, btnHeight))) {
+			m_window.minimize();
+		}
 
 		ImGui::SetCursorPos(ImVec2(right - 2.0f * btnWidth, 0.0f));
-		ImGui::Button("[]###MaximizeApp", ImVec2(btnWidth, btnHeight));
+		if (ImGui::Button("[]###MaximizeApp", ImVec2(btnWidth, btnHeight))) {
+			m_window.toggleMaximize();
+		}
 
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.0f, 0.0f, 0.70f)); // red on hover
 		ImGui::SetCursorPos(ImVec2(right - btnWidth, 0.0f));

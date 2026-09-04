@@ -80,6 +80,18 @@ namespace excelsior {
 		// m_window
 	}
 
+	bool Window::minimize() {
+		return SDL_MinimizeWindow(m_window.get());
+	}
+
+	bool Window::maximize() {
+		return SDL_MaximizeWindow(m_window.get());
+	}
+
+	bool Window::restore() {
+		return SDL_RestoreWindow(m_window.get());
+	}
+
 	SDL_Window* Window::nativeHandle() const noexcept {
 		return m_window.get();
 	}
@@ -96,6 +108,10 @@ namespace excelsior {
 		return SDL_GetWindowFlags(m_window.get()) & SDL_WINDOW_MINIMIZED;
 	}
 
+	bool Window::isMaximized() const noexcept {
+		return SDL_GetWindowFlags(m_window.get()) & SDL_WINDOW_MAXIMIZED;
+	}
+
 	std::pair<int, int> Window::framebufferSize() const noexcept {
 		int width = 0, height = 0;
 
@@ -106,5 +122,11 @@ namespace excelsior {
 
 	void Window::swapBuffers() const {
 		SDL_GL_SwapWindow(m_window.get());
+	}
+
+	bool Window::toggleMaximize() {
+		if (isMaximized())
+			return restore();
+		return maximize();
 	}
 }
