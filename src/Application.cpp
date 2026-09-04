@@ -34,19 +34,7 @@ namespace excelsior {
 
 		case SDL_EVENT_PEN_MOTION:
 			if (m_penInput.isDrawing()) m_topLeftTextMessage = "Writing";
-			break;
-
-		case SDL_EVENT_PEN_AXIS:
-			if (event.paxis.axis == SDL_PEN_AXIS_PRESSURE) {
-				const PenState& pen = m_penInput.state();
-
-				m_topLeftTextMessage = std::format(
-					"Actual pressure: {}, offset: {}, New Pressure: {}",
-					pen.rawPressure,
-					PenInput::PRESSURE_OFFSET,
-					pen.pressure
-				);
-			}
+			else m_topLeftTextMessage = "Idle";
 			break;
 		}
 
@@ -156,6 +144,9 @@ namespace excelsior {
 
 			if (pen.pressure > 0.0f)
 				ImGui::Text("Pressure: %.3f", pen.pressure);
+
+			if (pen.tiltX > 0.0f || pen.tiltY > 0.0f)
+				ImGui::Text("TiltX: %.1f, TiltY: %.1f", pen.tiltX, pen.tiltY);
 
 			if (ImGui::BeginPopupContextWindow())
 			{
