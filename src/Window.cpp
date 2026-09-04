@@ -130,9 +130,10 @@ namespace excelsior {
 		return maximize();
 	}
 
-	void Window::setTitleBarHitTest(float titleBarHeight, float captionButtonsWidth) {
+	void Window::setWindowChromeHitTest(float titleBarHeight, float captionButtonsWidth, float resizeBorderThickness) {
 		m_titleBarHeight = titleBarHeight;
 		m_captionButtonsWidth = captionButtonsWidth;
+		m_resizeBorderThickness = resizeBorderThickness;
 
 		SDL_GetWindowSize(m_window.get(), &m_windowWidth, nullptr);
 
@@ -151,16 +152,24 @@ namespace excelsior {
 	SDL_HitTestResult SDLCALL Window::hitTest(SDL_Window* window, const SDL_Point* point, void* data) {
 		auto* self = static_cast<Window*>(data);
 
-		const float constrolsStart = self->m_windowWidth - self->m_captionButtonsWidth;
+		int width = 0, height = 0;
 
-		const bool insideTitleBar =
-			(point->y >= 0) && (point->y < self->m_titleBarHeight);
-
-		const bool insideCaptionButtons = (point->x >= constrolsStart);
+		if (!SDL_GetWindowSize(window, &width, &height)) {
+			return SDL_HITTEST_NORMAL;
+		}
 		
-		if (insideTitleBar && !insideCaptionButtons)
+		if (self->isTitleBarDraggable(*point, width))
 			return SDL_HITTEST_DRAGGABLE;
 
 		return SDL_HITTEST_NORMAL;
+	}
+
+	// return true if pointer is inside title bar but not inside the caption buttons
+	bool Window::isTitleBarDraggable(const SDL_Point& point, int width) const noexcept {
+		const float constrolsStart = width - m_captionButtonsWidth;
+		const bool insideTitleBar = (point.y >= 0) && (point.y < m_titleBarHeight);
+		const bool insideCaptionButtons = (point.x >= constrolsStart);
+
+		return insideTitleBar && !insideCaptionButtons;
 	}
 }

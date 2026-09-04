@@ -44,10 +44,12 @@ public:
 	// call either maximize or restore
 	bool toggleMaximize();
 
-	void setTitleBarHitTest(float titleBarHeight, float captionButtonWidth);
+	void setWindowChromeHitTest(float titleBarHeight, float captionButtonWidth, float resizeBorderThickness = 0.0f);
 
 private:
 	static SDL_HitTestResult SDLCALL hitTest(SDL_Window* window, const SDL_Point* point, void* data);
+
+	bool isTitleBarDraggable(const SDL_Point& point, int width) const noexcept;
 
 	struct SDLWindowDeleter { void operator()(SDL_Window* w) const noexcept; };
 	struct GLContextDeleter { void operator()(SDL_GLContextState* c) const noexcept; };
@@ -63,6 +65,7 @@ private:
 	float m_titleBarHeight = 0.0f;
 	float m_captionButtonsWidth = 0.0f;
 	int m_windowWidth = 0;
+	float m_resizeBorderThickness = 0.0f;
 
 	bool m_hitTestRegistered = false;
 };
