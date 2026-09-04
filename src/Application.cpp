@@ -3,26 +3,12 @@
 #include "Application.hpp"
 #include "Stroke.hpp"
 
-#include <algorithm>
 #include <format>
-#include <stdexcept>
-
-#include <SDL3/SDL.h>
 
 #include <imgui.h>
-#include <imgui_impl_sdl3.h>
-#include <imgui_impl_opengl3.h>
 
-static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-static bool clear_color_changed = false;
 
-void SDLWindowDeleter::operator()(SDL_Window* w) const { if (w) SDL_DestroyWindow(w); }
-void GLContextDeleter::operator()(SDL_GLContext c) const {
-	if (c) {
-		SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), nullptr);
-		SDL_GL_DestroyContext(c);
-	}
-}
+namespace excelsior {
 
 Application::Application() {
 	SDL_SetAppMetadata("Excelsior", "0.1", "com.github.laughingclouds");
@@ -97,12 +83,6 @@ Application::Application() {
 		throw std::runtime_error(std::format("Couldn't initialize OpenGL Context"));
 	}
 
-	SDL_Log("GL v%d.%d Initialized", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
-
-	// gray background
-	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-}
-
 SDL_AppResult Application::handleEvent(const SDL_Event& event) {
 	ImGui_ImplSDL3_ProcessEvent(&event);
 
@@ -110,44 +90,13 @@ SDL_AppResult Application::handleEvent(const SDL_Event& event) {
 	case SDL_EVENT_QUIT:
 		return SDL_APP_SUCCESS;
 
-	case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: {
-		m_fbWidth = event.window.data1;
-		m_fbHeight = event.window.data2;
-		glViewport(0, 0, m_fbWidth, m_fbHeight);
-		break;
-	}
 	case SDL_EVENT_WINDOW_EXPOSED:
 		this->update(); break;
 	case SDL_EVENT_PEN_MOTION:
 		this->procesPenMotion(event); break;
 	case SDL_EVENT_PEN_AXIS:
-		this->processPenAxis(event); break;
-	}
-
-	return SDL_APP_CONTINUE;
-}
-
-
-void Application::procesPenMotion(const SDL_Event& event) {
-	if (m_pressure > 0.0f) {
-		if (m_previous_touchX >= 0.0f) { // only draw if we're moving while touching
-			m_topLeftTextMessage = "Writing";
-			SDL_Log(m_topLeftTextMessage.c_str());
-		}
-		m_previous_touchX = event.pmotion.x;
-		m_previous_touchY = event.pmotion.y;
-	}
-	else {
-		m_previous_touchX = m_previous_touchY = -1.0f;
-	}
-}
-
-void Application::processPenAxis(const SDL_Event& event) {
-	switch (event.paxis.axis) {
-	case SDL_PEN_AXIS_PRESSURE: {
-		const float rawPressure = event.paxis.value;
-
-		m_pressure = (rawPressure == 0.0f) ? 0.0f : std::min(rawPressure + PRESSURE_OFFSET, 1.0f);
+			if (event.paxis.axis == SDL_PEN_AXIS_PRESSURE) {
+				const PenState& pen = m_penInput.state();
 
 		m_topLeftTextMessage = std::format(
 			"Actual pressure: {}, offset: {}, New Pressure: {}",
