@@ -37,4 +37,14 @@ namespace excelsior {
 			m_state.tiltY = event.paxis.value; break;
 		}
 	}
+
+	const PenState& PenInput::state() const noexcept {
+		return m_state;
+	}
+
+	bool PenInput::isDrawing() const noexcept {
+		return (m_state.pressure > 0.0f &&
+			m_state.x >= 0.0f &&
+			m_state.y >= 0.0f);
+	}
 }
