@@ -193,6 +193,10 @@ namespace excelsior {
 			window_pos.y = (location & 2) ? (work_pos.y + work_size.y - PAD) : (work_pos.y + PAD);
 			window_pos_pivot.x = (location & 1) ? 1.0f : 0.0f;
 			window_pos_pivot.y = (location & 2) ? 1.0f : 0.0f;
+
+			if (location == 0 || location == 1) // offset from Application::drawWindowChrome()
+				window_pos.y += ImGui::GetFrameHeight();
+
 			ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
 			window_flags |= ImGuiWindowFlags_NoMove;
 		}
