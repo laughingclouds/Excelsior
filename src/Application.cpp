@@ -10,39 +10,15 @@
 
 namespace excelsior {
 
-Application::Application() {
-	SDL_SetAppMetadata("Excelsior", "0.1", "com.github.laughingclouds");
-
-	m_topLeftTextMessage = getMsg();
-
-	// print which render drivers are available
-	SDL_Log("Available renderer drivers:");
-	for (int i = 0; i < SDL_GetNumRenderDrivers(); i++) {
-		SDL_Log("%d. %s", i + 1, SDL_GetRenderDriver(i));
-	}
-
-	if (!SDL_InitSubSystem(SDL_INIT_VIDEO)) {
-		throw std::runtime_error(std::format("Couldn't initialize SDL: {}", SDL_GetError()));
-	}
-
-	const char* glsl_version = "#version 430";
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-	// following https://github.com/ocornut/imgui/blob/master/examples/example_sdl3_opengl3/main.cpp
-	// create window with graphics context
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-	
-	float main_scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
-	
-	SDL_WindowFlags window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY;
-
-	m_window.reset(SDL_CreateWindow("Excelsior", (int) (WINDOW_WIDTH * main_scale), (int) (WINDOW_HEIGHT * main_scale), window_flags));
-	if (!m_window) {
-		throw std::runtime_error(std::format("Couldn't create window/renderer: {}", SDL_GetError()));
+	Application::Application()
+		: 
+		m_window("Excelsior",
+			WINDOW_WIDTH,
+			WINDOW_HEIGHT
+		),
+		m_imgui(m_window),
+		m_topLeftTextMessage(getMsg())
+	{
 	}
 
 	m_glContext.reset(SDL_GL_CreateContext(m_window.get()));
@@ -84,28 +60,35 @@ Application::Application() {
 	}
 
 SDL_AppResult Application::handleEvent(const SDL_Event& event) {
-	ImGui_ImplSDL3_ProcessEvent(&event);
+		m_imgui.processEvent(event);
+		m_penInput.processEvent(event);
 
 	switch (event.type) {
 	case SDL_EVENT_QUIT:
 		return SDL_APP_SUCCESS;
 
 	case SDL_EVENT_WINDOW_EXPOSED:
-		this->update(); break;
+			return update();
+
 	case SDL_EVENT_PEN_MOTION:
-		this->procesPenMotion(event); break;
+			if (m_penInput.isDrawing()) m_topLeftTextMessage = "Writing";
+			break;
+
 	case SDL_EVENT_PEN_AXIS:
 			if (event.paxis.axis == SDL_PEN_AXIS_PRESSURE) {
 				const PenState& pen = m_penInput.state();
 
 		m_topLeftTextMessage = std::format(
 			"Actual pressure: {}, offset: {}, New Pressure: {}",
-			rawPressure, PRESSURE_OFFSET, m_pressure
+					pen.rawPressure,
+					PenInput::PRESSURE_OFFSET,
+					pen.pressure
 		);
+			}
 		break;
 	}
-	case SDL_PEN_AXIS_XTILT:
-		m_tiltX = event.paxis.value; break;
+
+		return SDL_APP_CONTINUE;
 	case SDL_PEN_AXIS_YTILT:
 		m_tiltY = event.paxis.value; break;
 	}
