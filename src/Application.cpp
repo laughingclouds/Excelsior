@@ -3,6 +3,7 @@
 #include "Application.hpp"
 #include "Stroke.hpp"
 
+#include <algorithm>
 #include <format>
 
 #include <imgui.h>
@@ -68,7 +69,7 @@ namespace excelsior {
 		}
 
 		m_imgui.beginFrame();
-
+		
 		updateLayout();
 		drawUi();
 
@@ -81,7 +82,7 @@ namespace excelsior {
 
 		return SDL_APP_CONTINUE;
 	}
-
+	
 	void Application::updateLayout() {
 		m_chromeHeight = ImGui::GetFrameHeight();
 	}
@@ -91,11 +92,6 @@ namespace excelsior {
 
 		if (m_showDemoWindow)
 			ImGui::ShowDemoWindow(&m_showDemoWindow);
-
-		showHelloWorldWindow();
-
-		if (m_showAnotherWindow)
-			showAnotherWindow();
 
 		showTopLeftOverlay();
 	}
@@ -164,42 +160,6 @@ namespace excelsior {
 		ImGui::PopStyleVar(3);
 	}
 
-	void Application::showHelloWorldWindow() {
-		ImGuiIO& io = ImGui::GetIO();
-		static float f = 0.0f;
-		static int counter = 0;
-
-		// Begin/End pair creates a named window
-		if (ImGui::Begin("Hello World!")) {
-			ImGui::Text(m_topLeftTextMessage.c_str());
-			ImGui::Checkbox("Demo Window", &m_showDemoWindow);
-			ImGui::Checkbox("Another Window", &m_showAnotherWindow);
-
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-			ImGui::ColorEdit3("Clear color", m_clearColor.data());
-
-			if (ImGui::Button("Button"))
-				counter++;
-
-			ImGui::SameLine();
-
-			ImGui::Text("counter = %d", counter);
-
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-		}
-
-		ImGui::End();
-	}
-
-	void Application::showAnotherWindow() {
-		if (ImGui::Begin("Another Window", &m_showAnotherWindow)) {
-			ImGui::Text("Hello from another window!");
-			if (ImGui::Button("Close me"))
-				m_showAnotherWindow = false;
-		}
-		ImGui::End();
-	}
-
 	void Application::showTopLeftOverlay(bool* p_open) {
 		static int location = 0;
 		ImGuiIO& io = ImGui::GetIO();
@@ -216,9 +176,6 @@ namespace excelsior {
 			window_pos_pivot.x = (location & 1) ? 1.0f : 0.0f;
 			window_pos_pivot.y = (location & 2) ? 1.0f : 0.0f;
 
-			if (location == 0 || location == 1) // offset from Application::drawWindowChrome()
-				window_pos.y += ImGui::GetFrameHeight();
-
 			ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
 			window_flags |= ImGuiWindowFlags_NoMove;
 		}
@@ -231,15 +188,21 @@ namespace excelsior {
 		ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
 		if (ImGui::Begin("Top Left Overlay", p_open, window_flags))
 		{
-			const PenState& pen = m_penInput.state();
+			ImGui::ColorEdit3("Clear color", m_clearColor.data());
 
 			ImGui::Text(m_topLeftTextMessage.c_str());
+			ImGui::SameLine();
+			ImGui::Checkbox("Demo Window", &m_showDemoWindow);
 			ImGui::Separator();
+
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
 			if (ImGui::IsMousePosValid())
 				ImGui::Text("Mouse Position: (%.1f, %.1f)", io.MousePos.x, io.MousePos.y);
 			else
 				ImGui::Text("Mouse Position: <invalid>");
-
+			
+			const PenState& pen = m_penInput.state();
 			if (pen.x != -1.0f)
 				ImGui::Text("Pen Position: (%.1f, %.1f)", pen.x, pen.y);
 

@@ -36,9 +36,6 @@ namespace excelsior {
 		// Custom window chrome
 		void drawWindowChrome();
 
-		/* A simple hello world window created by imgui */
-		void showHelloWorldWindow();
-		void showAnotherWindow();
 		void showTopLeftOverlay(bool* p_open = nullptr);
 		
 		Window m_window;
@@ -53,7 +50,6 @@ namespace excelsior {
 		};
 
 		bool m_showDemoWindow = true;
-		bool m_showAnotherWindow = false;
 
 		bool m_shouldQuit = false;
 
