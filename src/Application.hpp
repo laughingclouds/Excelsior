@@ -54,6 +54,8 @@ namespace excelsior {
 		bool m_shouldQuit = false;
 
 		std::string m_topLeftTextMessage;
+
+		const float m_resizeBorderThickness = 6.0f;
 	};
 
 }

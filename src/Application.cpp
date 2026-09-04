@@ -113,7 +113,7 @@ namespace excelsior {
 		const float btnHeight = chromeHeight;
 
 		// Make window chrome draggable
-		m_window.setTitleBarHitTest(chromeHeight, 3.0f * btnWidth);
+		m_window.setWindowChromeHitTest(chromeHeight, 3.0f * btnWidth, m_resizeBorderThickness);
 
 		// right most edge of current window (window chrome)
 		const float right = ImGui::GetWindowWidth();

@@ -153,9 +153,18 @@ namespace excelsior {
 		auto* self = static_cast<Window*>(data);
 
 		int width = 0, height = 0;
-
 		if (!SDL_GetWindowSize(window, &width, &height)) {
 			return SDL_HITTEST_NORMAL;
+		}
+
+		const SDL_WindowFlags flags = SDL_GetWindowFlags(window);
+		const bool maximized = flags & SDL_WINDOW_MAXIMIZED;
+
+		if (!maximized) {
+			const SDL_HitTestResult resizeResult = self->hitTestResizeBorder(*point, width, height);
+			
+			if (resizeResult != SDL_HITTEST_NORMAL)
+				return resizeResult;
 		}
 		
 		if (self->isTitleBarDraggable(*point, width))
@@ -171,5 +180,28 @@ namespace excelsior {
 		const bool insideCaptionButtons = (point.x >= constrolsStart);
 
 		return insideTitleBar && !insideCaptionButtons;
+	}
+
+	SDL_HitTestResult Window::hitTestResizeBorder(const SDL_Point& point, int width, int height) const noexcept {
+		const float border = m_resizeBorderThickness;
+
+		const bool left		= point.x < border;
+		const bool right	= point.x >= width - border;
+		const bool top		= point.y < border;
+		const bool bottom	= point.y >= height - border;
+		
+		// resize corners
+		if (top && left) return SDL_HITTEST_RESIZE_TOPLEFT;
+		if (top && right) return SDL_HITTEST_RESIZE_TOPRIGHT;
+		if (bottom && left) return SDL_HITTEST_RESIZE_BOTTOMLEFT;
+		if (bottom && right) return SDL_HITTEST_RESIZE_BOTTOMRIGHT;
+
+		// resize edges
+		if (top) return SDL_HITTEST_RESIZE_TOP;
+		if (bottom) return SDL_HITTEST_RESIZE_BOTTOM;
+		if (left) return SDL_HITTEST_RESIZE_LEFT;
+		if (right) return SDL_HITTEST_RESIZE_RIGHT;
+
+		return SDL_HITTEST_NORMAL;
 	}
 }
