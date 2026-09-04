@@ -3,6 +3,8 @@
 #include "Application.hpp"
 #include "Stroke.hpp"
 
+#include "ui/AppWorkArea.hpp"
+
 #include <algorithm>
 #include <format>
 
@@ -10,25 +12,6 @@
 
 
 namespace excelsior {
-
-	struct AppWorkArea {
-		ImVec2 pos;
-		ImVec2 size;
-	};
-
-	static AppWorkArea getAppWorkArea(float chromeHeight) {
-		const ImGuiViewport* viewport = ImGui::GetMainViewport();
-
-		AppWorkArea workArea{
-			.pos = viewport->WorkPos,
-			.size = viewport->WorkSize
-		};
-
-		workArea.pos.y += chromeHeight;
-		workArea.size.y = std::max(0.0f, workArea.size.y - chromeHeight);
-
-		return workArea;
-	}
 
 	Application::Application()
 		: 
