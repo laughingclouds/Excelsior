@@ -10,6 +10,25 @@
 
 namespace excelsior {
 
+	struct AppWorkArea {
+		ImVec2 pos;
+		ImVec2 size;
+	};
+
+	static AppWorkArea getAppWorkArea(float chromeHeight) {
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+		AppWorkArea workArea{
+			.pos = viewport->WorkPos,
+			.size = viewport->WorkSize
+		};
+
+		workArea.pos.y += chromeHeight;
+		workArea.size.y = std::max(0.0f, workArea.size.y - chromeHeight);
+
+		return workArea;
+	}
+
 	Application::Application()
 		: 
 		m_window("Excelsior",
@@ -50,6 +69,7 @@ namespace excelsior {
 
 		m_imgui.beginFrame();
 
+		updateLayout();
 		drawUi();
 
 		m_imgui.render(m_clearColor);
@@ -60,6 +80,10 @@ namespace excelsior {
 		}
 
 		return SDL_APP_CONTINUE;
+	}
+
+	void Application::updateLayout() {
+		m_chromeHeight = ImGui::GetFrameHeight();
 	}
 
 	void Application::drawUi() {
@@ -79,14 +103,12 @@ namespace excelsior {
 	void Application::drawWindowChrome() {
 		const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-		const float chromeHeight = ImGui::GetFrameHeight();
-
-		const float btnWidth = chromeHeight * 2.5;
-		const float btnHeight = chromeHeight;
+		const float btnWidth = m_chromeHeight * 2.5;
+		const float btnHeight = m_chromeHeight;
 		const float captionButtonsWidth = 3.0f * btnWidth;
 
 		// native window behavior using chrome dimensions
-		m_window.configureChromeHitTest(chromeHeight, captionButtonsWidth, m_resizeBorderThickness);
+		m_window.configureChromeHitTest(m_chromeHeight, captionButtonsWidth, m_resizeBorderThickness);
 		
 		// strip padding, border, minimum restriction
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -94,7 +116,7 @@ namespace excelsior {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0.0f, 0.0f));
 
 		ImGui::SetNextWindowPos(viewport->Pos, ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, chromeHeight), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, m_chromeHeight), ImGuiCond_Always);
 
 		ImGui::Begin("Excelsior###MainWindowChrome",
 			nullptr,
@@ -106,7 +128,7 @@ namespace excelsior {
 
 		// Title bar
 		const float textLineHeight = ImGui::GetTextLineHeight();
-		const float textY = (chromeHeight - textLineHeight) * 0.5f;
+		const float textY = (m_chromeHeight - textLineHeight) * 0.5f;
 		ImGui::SetCursorPos(ImVec2(
 			8.0f, // space on left side of text
 			textY // Y coordinate at middle of imgui window
@@ -185,9 +207,9 @@ namespace excelsior {
 		if (location >= 0)
 		{
 			const float PAD = 10.0f;
-			const ImGuiViewport* viewport = ImGui::GetMainViewport();
-			ImVec2 work_pos = viewport->WorkPos; // Use work area to avoid menu-bar/task-bar, if any!
-			ImVec2 work_size = viewport->WorkSize;
+			const AppWorkArea workArea = getAppWorkArea(m_chromeHeight);
+			ImVec2 work_pos = workArea.pos; // Use work area to avoid menu-bar/task-bar, if any!
+			ImVec2 work_size = workArea.size;
 			ImVec2 window_pos, window_pos_pivot;
 			window_pos.x = (location & 1) ? (work_pos.x + work_size.x - PAD) : (work_pos.x + PAD);
 			window_pos.y = (location & 2) ? (work_pos.y + work_size.y - PAD) : (work_pos.y + PAD);

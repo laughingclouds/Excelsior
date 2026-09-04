@@ -27,6 +27,10 @@ namespace excelsior {
 		SDL_AppResult update();
 
 	private:
+		// update window layout related values
+		// always call before drawUi()
+		void updateLayout();
+
 		void drawUi();
 
 		// Custom window chrome
@@ -55,6 +59,7 @@ namespace excelsior {
 
 		std::string m_topLeftTextMessage;
 
+		float m_chromeHeight = 0.0f;
 		const float m_resizeBorderThickness = 6.0f;
 	};
 
