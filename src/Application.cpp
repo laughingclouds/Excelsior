@@ -75,8 +75,7 @@ namespace excelsior {
 		static int counter = 0;
 
 		// Begin/End pair creates a named window
-		ImGui::Begin("Hello World!");
-
+		if (ImGui::Begin("Hello World!")) {
 		ImGui::Text(m_topLeftTextMessage.c_str());
 		ImGui::Checkbox("Demo Window", &m_showDemoWindow);
 		ImGui::Checkbox("Another Window", &m_showAnotherWindow);
@@ -92,14 +91,17 @@ namespace excelsior {
 		ImGui::Text("counter = %d", counter);
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+		}
+
 		ImGui::End();
 	}
 
 	void Application::showAnotherWindow() {
-		ImGui::Begin("Another Window", &m_showAnotherWindow);
+		if (ImGui::Begin("Another Window", &m_showAnotherWindow)) {
 		ImGui::Text("Hello from another window!");
 		if (ImGui::Button("Close me"))
 			m_showAnotherWindow = false;
+		}
 		ImGui::End();
 	}
 
