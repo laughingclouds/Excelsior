@@ -34,7 +34,7 @@ namespace excelsior {
 			SDL_WINDOW_OPENGL |
 			SDL_WINDOW_RESIZABLE |
 			SDL_WINDOW_HIDDEN |
-			//SDL_WINDOW_BORDERLESS |
+			SDL_WINDOW_BORDERLESS |
 			SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
 		m_window.reset(
@@ -128,5 +128,39 @@ namespace excelsior {
 		if (isMaximized())
 			return restore();
 		return maximize();
+	}
+
+	void Window::setTitleBarHitTest(float titleBarHeight, float captionButtonsWidth) {
+		m_titleBarHeight = titleBarHeight;
+		m_captionButtonsWidth = captionButtonsWidth;
+
+		SDL_GetWindowSize(m_window.get(), &m_windowWidth, nullptr);
+
+		if (!m_hitTestRegistered) {
+			if (!SDL_SetWindowHitTest(
+				m_window.get(),
+				Window::hitTest,
+				this
+			)) {
+				throw std::runtime_error(std::format("Couldn't set window hit test: {}", SDL_GetError()));
+			}
+			m_hitTestRegistered = true;
+		}
+	}
+
+	SDL_HitTestResult SDLCALL Window::hitTest(SDL_Window* window, const SDL_Point* point, void* data) {
+		auto* self = static_cast<Window*>(data);
+
+		const float constrolsStart = self->m_windowWidth - self->m_captionButtonsWidth;
+
+		const bool insideTitleBar =
+			(point->y >= 0) && (point->y < self->m_titleBarHeight);
+
+		const bool insideCaptionButtons = (point->x >= constrolsStart);
+		
+		if (insideTitleBar && !insideCaptionButtons)
+			return SDL_HITTEST_DRAGGABLE;
+
+		return SDL_HITTEST_NORMAL;
 	}
 }

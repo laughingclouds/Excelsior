@@ -44,7 +44,11 @@ public:
 	// call either maximize or restore
 	bool toggleMaximize();
 
+	void setTitleBarHitTest(float titleBarHeight, float captionButtonWidth);
+
 private:
+	static SDL_HitTestResult SDLCALL hitTest(SDL_Window* window, const SDL_Point* point, void* data);
+
 	struct SDLWindowDeleter { void operator()(SDL_Window* w) const noexcept; };
 	struct GLContextDeleter { void operator()(SDL_GLContextState* c) const noexcept; };
 
@@ -55,5 +59,11 @@ private:
 	UniqueGLContext m_glContext;
 
 	float m_contentScale = 1.0f;
+
+	float m_titleBarHeight = 0.0f;
+	float m_captionButtonsWidth = 0.0f;
+	int m_windowWidth = 0;
+
+	bool m_hitTestRegistered = false;
 };
 }
