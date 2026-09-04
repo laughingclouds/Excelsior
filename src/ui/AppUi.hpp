@@ -11,7 +11,7 @@ namespace excelsior {
 	public:
 		AppUi(Window& window, PenInput& penInput);
 
-		void draw(std::array<float, 3>& clearColor, const std::strong_ordering& topLeftTextMessage);
+		void draw(std::array<float, 3>& clearColor, const std::string& topLeftTextMessage);
 
 		[[nodiscard]]
 		bool shouldQuit() const noexcept;
