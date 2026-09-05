@@ -45,21 +45,36 @@ target_sources(Excelsior
 
 set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendored/imgui")
 
-target_sources(Excelsior
-    PRIVATE
+set(IMGUI_SOURCES
         # Core files
         "${IMGUI_DIR}/imgui.cpp"
-        "${IMGUI_DIR}/imgui.h"
         "${IMGUI_DIR}/imgui_demo.cpp"
         "${IMGUI_DIR}/imgui_draw.cpp"
-        "${IMGUI_DIR}/imgui_internal.h"
         "${IMGUI_DIR}/imgui_tables.cpp"
         "${IMGUI_DIR}/imgui_widgets.cpp"
         # Backends
         "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
-        "${IMGUI_DIR}/backends/imgui_impl_opengl3.h"
         "${IMGUI_DIR}/backends/imgui_impl_sdl3.cpp"
+)
+
+target_sources(Excelsior
+    PRIVATE
+        ${IMGUI_SOURCES}
+
+        # Core files
+        "${IMGUI_DIR}/imgui.h"
+        "${IMGUI_DIR}/imgui_internal.h"
+        # Backends
+        "${IMGUI_DIR}/backends/imgui_impl_opengl3.h"
         "${IMGUI_DIR}/backends/imgui_impl_sdl3.h"
+)
+
+# skip for gl.c, and imgui source files
+set_source_files_properties(
+    "src/gl.c"
+    ${IMGUI_SOURCES}
+    PROPERTIES
+        SKIP_PRECOMPILE_HEADERS ON
 )
 
 target_precompile_headers(Excelsior
@@ -69,6 +84,8 @@ target_precompile_headers(Excelsior
         <format>
         <algorithm>
         <memory>
+
+        <imgui.h>
 )
 
 target_include_directories(Excelsior
