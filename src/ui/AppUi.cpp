@@ -1,0 +1,163 @@
+#include "AppUi.hpp"
+#include "AppWorkArea.hpp"
+
+#include "Window.hpp"
+#include "PenInput.hpp"
+
+namespace excelsior {
+
+	AppUi::AppUi(Window& window, PenInput& penInput)
+		:
+		m_window(window),
+		m_penInput(penInput)
+	{
+	}
+
+	void AppUi::draw(std::array<float, 4>& clearColor, const std::string& topLeftTextMessage) {
+		updateLayout();
+		drawWindowChrome();
+
+		if (m_showDemoWindow)
+			ImGui::ShowDemoWindow(&m_showDemoWindow);
+
+		drawTopLeftOverlay(clearColor, topLeftTextMessage);
+	}
+
+	bool AppUi::shouldQuit() const noexcept {
+		return m_shouldQuit;
+	}
+
+	void AppUi::updateLayout() {
+		m_chromeHeight = ImGui::GetFrameHeight();
+	}
+
+	void AppUi::drawWindowChrome() {
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+		const float btnWidth = m_chromeHeight * 2.5;
+		const float btnHeight = m_chromeHeight;
+		const float captionButtonsWidth = 3.0f * btnWidth;
+
+		// native window behavior using chrome dimensions
+		m_window.configureChromeHitTest(m_chromeHeight, captionButtonsWidth, m_resizeBorderThickness);
+
+		// strip padding, border, minimum restriction
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0.0f, 0.0f));
+
+		ImGui::SetNextWindowPos(viewport->Pos, ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, m_chromeHeight), ImGuiCond_Always);
+
+		ImGui::Begin("Excelsior###MainWindowChrome",
+			nullptr,
+			ImGuiWindowFlags_NoDecoration |
+			ImGuiWindowFlags_NoMove |
+			//ImGuiWindowFlags_NoBackground |
+			ImGuiWindowFlags_NoSavedSettings
+		);
+
+		// Title bar
+		const float textLineHeight = ImGui::GetTextLineHeight();
+		const float textY = (m_chromeHeight - textLineHeight) * 0.5f;
+		ImGui::SetCursorPos(ImVec2(
+			8.0f, // space on left side of text
+			textY // Y coordinate at middle of imgui window
+		));
+		ImGui::TextUnformatted("Excelsior");
+
+		// Window buttons
+
+		// right most edge of current window (window chrome)
+		const float right = ImGui::GetWindowWidth();
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)); // invisible bg
+
+		ImGui::SetCursorPos(ImVec2(right - 3.0f * btnWidth, 0.0f));
+		if (ImGui::Button("_###MinimizeApp", ImVec2(btnWidth, btnHeight))) {
+			m_window.minimize();
+		}
+
+		ImGui::SetCursorPos(ImVec2(right - 2.0f * btnWidth, 0.0f));
+		if (ImGui::Button("[]###MaximizeApp", ImVec2(btnWidth, btnHeight))) {
+			m_window.toggleMaximize();
+		}
+
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.0f, 0.0f, 0.70f)); // red on hover
+		ImGui::SetCursorPos(ImVec2(right - btnWidth, 0.0f));
+		if (ImGui::Button("X###QuitApp", ImVec2(btnWidth, btnHeight))) {
+			m_shouldQuit = true;
+		}
+
+		ImGui::PopStyleColor(2);
+
+		ImGui::End();
+		ImGui::PopStyleVar(3);
+	}
+
+	void AppUi::drawTopLeftOverlay(std::array<float, 4>& clearColor, const std::string& topLeftTextMessage) {
+		static int location = 0;
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+		if (location >= 0)
+		{
+			const float PAD = 10.0f;
+			const AppWorkArea workArea = getAppWorkArea(m_chromeHeight);
+			ImVec2 work_pos = workArea.pos; // Use work area to avoid menu-bar/task-bar, if any!
+			ImVec2 work_size = workArea.size;
+			ImVec2 window_pos, window_pos_pivot;
+			window_pos.x = (location & 1) ? (work_pos.x + work_size.x - PAD) : (work_pos.x + PAD);
+			window_pos.y = (location & 2) ? (work_pos.y + work_size.y - PAD) : (work_pos.y + PAD);
+			window_pos_pivot.x = (location & 1) ? 1.0f : 0.0f;
+			window_pos_pivot.y = (location & 2) ? 1.0f : 0.0f;
+
+			ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+			window_flags |= ImGuiWindowFlags_NoMove;
+		}
+		else if (location == -2)
+		{
+			// Center window
+			ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+			window_flags |= ImGuiWindowFlags_NoMove;
+		}
+		ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
+		if (ImGui::Begin("Top Left Overlay", nullptr, window_flags))
+		{
+			ImGui::ColorEdit3("Clear color", clearColor.data());
+
+			ImGui::Text(topLeftTextMessage.c_str());
+			ImGui::SameLine();
+			ImGui::Checkbox("Demo Window", &m_showDemoWindow);
+			ImGui::Separator();
+
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
+			if (ImGui::IsMousePosValid())
+				ImGui::Text("Mouse Position: (%.1f, %.1f)", io.MousePos.x, io.MousePos.y);
+			else
+				ImGui::Text("Mouse Position: <invalid>");
+
+			const PenState& pen = m_penInput.state();
+			if (pen.x != -1.0f)
+				ImGui::Text("Pen Position: (%.1f, %.1f)", pen.x, pen.y);
+
+			if (pen.pressure > 0.0f)
+				ImGui::Text("Pressure: %.3f", pen.pressure);
+
+			if (pen.tiltX > 0.0f || pen.tiltY > 0.0f)
+				ImGui::Text("TiltX: %.1f, TiltY: %.1f", pen.tiltX, pen.tiltY);
+
+			if (ImGui::BeginPopupContextWindow())
+			{
+				if (ImGui::MenuItem("Custom", NULL, location == -1)) location = -1;
+				if (ImGui::MenuItem("Center", NULL, location == -2)) location = -2;
+				if (ImGui::MenuItem("Top-left", NULL, location == 0)) location = 0;
+				if (ImGui::MenuItem("Top-right", NULL, location == 1)) location = 1;
+				if (ImGui::MenuItem("Bottom-left", NULL, location == 2)) location = 2;
+				if (ImGui::MenuItem("Bottom-right", NULL, location == 3)) location = 3;
+				ImGui::EndPopup();
+			}
+		}
+		ImGui::End();
+	}
+}

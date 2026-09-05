@@ -11,17 +11,20 @@ namespace excelsior {
 	public:
 		AppUi(Window& window, PenInput& penInput);
 
-		void draw(std::array<float, 3>& clearColor, const std::string& topLeftTextMessage);
+		void draw(std::array<float, 4>& clearColor, const std::string& topLeftTextMessage);
 
 		[[nodiscard]]
 		bool shouldQuit() const noexcept;
 
 	private:
+		// update window layout related values
+		// always call before draw()
 		void updateLayout();
 
+		// Custom window chrome
 		void drawWindowChrome();
 
-		void showTopLeftOverlay(std::array<float, 3>& clearColor, const std::string& topLeftTextMessage, bool* p_open = nullptr);
+		void drawTopLeftOverlay(std::array<float, 4>& clearColor, const std::string& topLeftTextMessage);
 
 		Window& m_window;
 		PenInput& m_penInput;

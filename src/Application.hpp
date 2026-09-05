@@ -4,6 +4,8 @@
 #include "PenInput.hpp"
 #include "Window.hpp"
 
+#include "ui/AppUi.hpp"
+
 #include <array>
 #include <string>
 
@@ -26,21 +28,11 @@ namespace excelsior {
 		// Call within SDL_AppIterate
 		SDL_AppResult update();
 
-	private:
-		// update window layout related values
-		// always call before drawUi()
-		void updateLayout();
-
-		void drawUi();
-
-		// Custom window chrome
-		void drawWindowChrome();
-
-		void showTopLeftOverlay(bool* p_open = nullptr);
-		
+	private:	
 		Window m_window;
 		ImGuiLayer m_imgui;
 		PenInput m_penInput;
+		AppUi m_ui;
 
 		std::array<float, 4> m_clearColor{
 			0.45f,	// r
@@ -53,10 +45,7 @@ namespace excelsior {
 
 		bool m_shouldQuit = false;
 
-		std::string m_topLeftTextMessage;
-
-		float m_chromeHeight = 0.0f;
-		const float m_resizeBorderThickness = 6.0f;
+		std::string m_overlayTextMessage;
 	};
 
 }
