@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include <SDL3/SDL_events.h>
+union SDL_Event;
 
 namespace excelsior {
 	class Window;

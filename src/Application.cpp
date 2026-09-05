@@ -3,12 +3,12 @@
 #include "Application.hpp"
 #include "Stroke.hpp"
 
-#include "ui/AppWorkArea.hpp"
-
 #include <algorithm>
 #include <format>
 
-#include <imgui.h>
+#include <SDL3/SDL_init.h>
+#include <SDL3/SDL_timer.h>
+#include <SDL3/SDL_events.h>
 
 
 namespace excelsior {

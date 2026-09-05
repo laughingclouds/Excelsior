@@ -10,6 +10,8 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
 
+#include <SDL3/SDL_events.h>
+
 namespace excelsior {
 	ImGuiLayer::ImGuiLayer(Window& window) : m_window(window) {
 		// setup imgui context

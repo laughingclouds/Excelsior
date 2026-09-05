@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <SDL3/SDL_events.h>
+
 namespace excelsior {
 	void PenInput::processEvent(const SDL_Event& event) {
 		switch (event.type) {

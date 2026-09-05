@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL3/SDL_events.h>
+union SDL_Event;
 
 namespace excelsior {
 	struct PenState {

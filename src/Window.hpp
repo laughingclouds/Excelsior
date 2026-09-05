@@ -3,7 +3,12 @@
 #include <memory>
 #include <utility>
 
-#include <SDL3/SDL_video.h>
+#include <SDL3/SDL_stdinc.h>
+
+struct SDL_Window;
+struct SDL_Point;
+typedef struct SDL_GLContextState* SDL_GLContext;
+enum SDL_HitTestResult;
 
 namespace excelsior {
 class Window {

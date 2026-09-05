@@ -9,7 +9,9 @@
 #include <array>
 #include <string>
 
-#include <SDL3/SDL.h>
+
+enum SDL_AppResult;
+union SDL_Event;
 
 namespace excelsior {
 

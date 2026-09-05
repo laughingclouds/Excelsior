@@ -4,7 +4,9 @@
 #include <stdexcept>
 
 #include <glad/gl.h>
-#include <SDL3/SDL.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_log.h>
+#include <SDL3/SDL_video.h>
 
 namespace excelsior {
 
