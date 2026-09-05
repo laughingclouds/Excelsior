@@ -21,8 +21,8 @@ namespace excelsior {
 		),
 		m_imgui(m_window),
 		m_penInput(),
-		m_ui(m_window, m_penInput),
-		m_overlayTextMessage(getMsg())
+		m_ui(m_window, m_penInput, m_clearColor, m_shouldQuit, m_overlayText),
+		m_overlayText(getMsg())
 	{
 	}
 
@@ -39,8 +39,8 @@ namespace excelsior {
 			return update();
 
 		case SDL_EVENT_PEN_MOTION:
-			if (m_penInput.isDrawing()) m_overlayTextMessage = "Writing";
-			else m_overlayTextMessage = "Idle";
+			if (m_penInput.isDrawing()) m_overlayText = "Writing";
+			else m_overlayText = "Idle";
 			break;
 		}
 
@@ -55,10 +55,7 @@ namespace excelsior {
 
 		m_imgui.beginFrame();
 		
-		m_ui.draw(
-			m_clearColor,
-			m_overlayTextMessage
-		);
+		m_ui.draw();
 
 		m_imgui.render(m_clearColor);
 		m_window.swapBuffers();

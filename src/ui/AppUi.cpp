@@ -6,21 +6,30 @@
 
 namespace excelsior {
 
-	AppUi::AppUi(Window& window, PenInput& penInput)
+	AppUi::AppUi(
+		Window& window,
+		PenInput& penInput,
+		std::array<float, 4>& clearColor,
+		bool& shouldQuit,
+		std::string& overlayText
+	)
 		:
 		m_window(window),
-		m_penInput(penInput)
+		m_penInput(penInput),
+		m_clearColor(clearColor),
+		m_shouldQuit(shouldQuit),
+		m_overlayText(overlayText)
 	{
 	}
 
-	void AppUi::draw(std::array<float, 4>& clearColor, const std::string& topLeftTextMessage) {
+	void AppUi::draw() {
 		updateLayout();
 		drawWindowChrome();
 
 		if (m_showDemoWindow)
 			ImGui::ShowDemoWindow(&m_showDemoWindow);
 
-		drawTopLeftOverlay(clearColor, topLeftTextMessage);
+		drawTopLeftOverlay();
 	}
 
 	bool AppUi::shouldQuit() const noexcept {
@@ -95,7 +104,7 @@ namespace excelsior {
 		ImGui::PopStyleVar(3);
 	}
 
-	void AppUi::drawTopLeftOverlay(std::array<float, 4>& clearColor, const std::string& topLeftTextMessage) {
+	void AppUi::drawTopLeftOverlay() {
 		static int location = 0;
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
@@ -123,9 +132,9 @@ namespace excelsior {
 		ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
 		if (ImGui::Begin("Top Left Overlay", nullptr, window_flags))
 		{
-			ImGui::ColorEdit3("Clear color", clearColor.data());
+			ImGui::ColorEdit3("Clear color", m_clearColor.data());
 
-			ImGui::Text(topLeftTextMessage.c_str());
+			ImGui::Text(m_overlayText.c_str());
 			ImGui::SameLine();
 			ImGui::Checkbox("Demo Window", &m_showDemoWindow);
 			ImGui::Separator();

@@ -29,10 +29,6 @@ namespace excelsior {
 		SDL_AppResult update();
 
 	private:	
-		Window m_window;
-		ImGuiLayer m_imgui;
-		PenInput m_penInput;
-		AppUi m_ui;
 
 		std::array<float, 4> m_clearColor{
 			0.45f,	// r
@@ -41,11 +37,13 @@ namespace excelsior {
 			1.00f	// a
 		};
 
-		bool m_showDemoWindow = true;
-
 		bool m_shouldQuit = false;
+		std::string m_overlayText;
 
-		std::string m_overlayTextMessage;
+		Window m_window;
+		ImGuiLayer m_imgui;
+		PenInput m_penInput;
+		AppUi m_ui;
 	};
 
 }

@@ -9,9 +9,15 @@ namespace excelsior {
 
 	class AppUi {
 	public:
-		AppUi(Window& window, PenInput& penInput);
+		AppUi(
+			Window& window,
+			PenInput& penInput,
+			std::array<float, 4>& clearColor,
+			bool& shouldQuit,
+			std::string& overlayText
+		);
 
-		void draw(std::array<float, 4>& clearColor, const std::string& topLeftTextMessage);
+		void draw();
 
 		[[nodiscard]]
 		bool shouldQuit() const noexcept;
@@ -24,15 +30,18 @@ namespace excelsior {
 		// Custom window chrome
 		void drawWindowChrome();
 
-		void drawTopLeftOverlay(std::array<float, 4>& clearColor, const std::string& topLeftTextMessage);
+		void drawTopLeftOverlay();
 
 		Window& m_window;
 		PenInput& m_penInput;
+
+		std::array<float, 4>& m_clearColor;
+		bool& m_shouldQuit;
+		std::string& m_overlayText;
 
 		float m_chromeHeight = 0.0f;
 		float m_resizeBorderThickness = 5.0f;
 
 		bool m_showDemoWindow = false;
-		bool m_shouldQuit = false;
 	};
 }
