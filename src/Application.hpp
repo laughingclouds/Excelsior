@@ -2,9 +2,8 @@
 
 #include "ImGuiLayer.hpp"
 #include "PenInput.hpp"
-#include "Window.hpp"
-
 #include "ui/AppUi.hpp"
+#include "Window.hpp"
 
 #include <array>
 #include <string>

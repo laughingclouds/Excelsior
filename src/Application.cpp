@@ -1,14 +1,10 @@
-#include <glad/gl.h>
-
 #include "Application.hpp"
+
 #include "Stroke.hpp"
 
-#include <algorithm>
-#include <format>
-
+#include <SDL3/SDL_events.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_timer.h>
-#include <SDL3/SDL_events.h>
 
 
 namespace excelsior {

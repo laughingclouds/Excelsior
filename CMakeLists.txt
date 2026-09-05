@@ -62,6 +62,15 @@ target_sources(Excelsior
         "${IMGUI_DIR}/backends/imgui_impl_sdl3.h"
 )
 
+target_precompile_headers(Excelsior
+    PRIVATE
+        <string>
+        <stdexcept>
+        <format>
+        <algorithm>
+        <memory>
+)
+
 target_include_directories(Excelsior
     PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
