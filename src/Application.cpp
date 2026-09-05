@@ -56,7 +56,7 @@ namespace excelsior {
 		m_imgui.render(m_clearColor);
 		m_window.swapBuffers();
 
-		if (m_ui.shouldQuit()) {
+		if (m_shouldQuit) {
 			return SDL_APP_SUCCESS;
 		}
 

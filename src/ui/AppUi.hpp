@@ -6,6 +6,7 @@
 namespace excelsior {
 	class Window;
 	class PenInput;
+	struct AppWorkArea;
 
 	class AppUi {
 	public:
@@ -19,9 +20,6 @@ namespace excelsior {
 
 		void draw();
 
-		[[nodiscard]]
-		bool shouldQuit() const noexcept;
-
 	private:
 		// update window layout related values
 		// always call before draw()
@@ -30,7 +28,7 @@ namespace excelsior {
 		// Custom window chrome
 		void drawWindowChrome();
 
-		void drawTopLeftOverlay();
+		void drawDebugOverlay(const AppWorkArea workArea);
 
 		Window& m_window;
 		PenInput& m_penInput;
@@ -40,7 +38,7 @@ namespace excelsior {
 		std::string& m_overlayText;
 
 		float m_chromeHeight = 0.0f;
-		float m_resizeBorderThickness = 5.0f;
+		float m_resizeBorderThickness = 3.0f;
 
 		bool m_showDemoWindow = false;
 	};

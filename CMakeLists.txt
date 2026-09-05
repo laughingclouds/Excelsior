@@ -41,6 +41,8 @@ target_sources(Excelsior
         "src/ui/AppWorkArea.hpp"
         "src/ui/AppUi.cpp"
         "src/ui/AppUi.hpp"
+        "src/ui/WindowChrome.cpp"
+        "src/ui/DebugOverlay.cpp"
 )
 
 set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendored/imgui")
