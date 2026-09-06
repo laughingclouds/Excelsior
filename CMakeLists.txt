@@ -45,7 +45,7 @@ target_sources(Excelsior
         "src/ui/DebugOverlay.cpp"
 )
 
-option(ENABLE_EXERCISE "Build Exercise subsystem for OpenGL experiments (defaults to OFF)" OFF)
+option(ENABLE_EXERCISE "Build exercises from https://learnopengl.com/ (defaults to OFF)" OFF)
 
 if(ENABLE_EXERCISE)
     set(EXERCISE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/ui/exercise")
