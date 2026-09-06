@@ -16,6 +16,7 @@ namespace excelsior {
 // concatenate two tokens, would become ab or
 // ui_group_42 (if ran on line 42)
 #define UI_CONCAT_IMPL(a, b) a ## b
+// extra macro to force __LINE__ to be expanded before we concatenate
 #define UI_CONCAT(a, b) UI_CONCAT_IMPL(a, b)
 
 /* Secretly declare a variable with a unique name
