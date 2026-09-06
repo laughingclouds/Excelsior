@@ -1,12 +1,17 @@
 #include "Exercise.hpp"
 #include "ui/AppWorkArea.hpp"
 
-namespace excelsior {
-	namespace exercise {
-		Exercise ex;
+namespace excelsior::exercise {
+	Exercise ex;
 
-		void Exercise::draw(const AppWorkArea workArea) {
-			drawExerciseSelectWindow(workArea);
-		}
+	Exercise::Exercise() :
+		m_primaryFragColor(orangeColVec),
+		m_secondaryFragColor(yellowColVec)
+	{
 	}
+
+	void Exercise::draw(const AppWorkArea workArea) {
+		drawExerciseSelectWindow(workArea);
+	}
+
 }

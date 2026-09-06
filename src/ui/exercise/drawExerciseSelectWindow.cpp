@@ -1,39 +1,77 @@
 #include "Exercise.hpp"
 
 #include "ui/AppWorkArea.hpp"
+#include "ui/imgui_raii.hpp"
+#include "ui/utils.hpp"
+
 #include <imgui.h>
 
-namespace excelsior {
-	namespace exercise {
-		void Exercise::drawExerciseSelectWindow(const AppWorkArea workArea) {
-			const float LEFT_PAD = 10.0f;
-			ImVec2 work_pos = workArea.pos;
-			ImVec2 work_size = workArea.size;
+namespace excelsior::exercise {
 
-			ImVec2 window_pos, window_pos_pivot;
+	void Exercise::drawExerciseSelectWindow(const AppWorkArea workArea) {
+		const float LEFT_PAD = 10.0f;
+		ImVec2 work_pos = workArea.pos;
+		ImVec2 work_size = workArea.size;
 
-			// left most edge
-			window_pos.x = work_pos.x + LEFT_PAD;
-			window_pos.y = work_pos.y + work_size.y * 0.5f;
+		ImVec2 window_pos, window_pos_pivot;
 
-			// pivot around left center edge of window
-			ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, ImVec2(0.0f, 0.5f));
+		// left most edge
+		window_pos.x = work_pos.x + LEFT_PAD;
+		window_pos.y = work_pos.y + work_size.y * 0.5f;
 
-			ImGuiWindowFlags flags = ImGuiWindowFlags_None;
-			flags |= ImGuiWindowFlags_NoMove;
-			flags |= ImGuiWindowFlags_NoCollapse;
-			flags |= ImGuiWindowFlags_NoSavedSettings;
-			//flags |= ImGuiWindowFlags_NoTitleBar;
-			flags |= ImGuiWindowFlags_NoResize;
-			flags |= ImGuiWindowFlags_AlwaysAutoResize;
+		// pivot around left center edge of window
+		ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, ImVec2(0.0f, 0.5f));
 
-			if (ImGui::Begin("Rendering", nullptr, flags)) {
-				ImGui::TextUnformatted("Well LMAO");
-				//ImGui::BeginListBox("List");
-				//ImGui::ListBox("List");
-				//ImGui::EndListBox();
+		ImGuiWindowFlags flags = ImGuiWindowFlags_None;
+		flags |= ImGuiWindowFlags_NoMove;
+		flags |= ImGuiWindowFlags_NoCollapse;
+		flags |= ImGuiWindowFlags_NoSavedSettings;
+		//flags |= ImGuiWindowFlags_NoTitleBar;
+		flags |= ImGuiWindowFlags_NoResize;
+		flags |= ImGuiWindowFlags_AlwaysAutoResize;
+
+		if (ImGui::Begin("Rendering", nullptr, flags)) {
+			ui::spacerY();
+			ImGui::TextUnformatted("Exercise");
+			ImGui::RadioButton("Triangle (Default)", &m_type, DEFAULT_TRIANGLE);
+			ImGui::RadioButton("Rectangle", &m_type, RECTANGLE);
+			ImGui::RadioButton("Two Triangles", &m_type, TWO_TRIANGLES);
+			ImGui::RadioButton("Two Triangles (Different Color)", &m_type, TWO_TRIANGLES_DIFF_COL);
+			ui::spacerY();
+			ImGui::Checkbox("Wireframe", &m_isPolygonMode);
+			ui::spacerY();
+
+			{
+				UI_GROUP();
+
+				ImGui::TextUnformatted("Shader");
+				
+				if (ImGui::Button("Orange")) {
+					m_primaryFragColor = orangeColVec;
+					m_secondaryFragColor = yellowColVec;
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Yellow")) {
+					m_primaryFragColor = yellowColVec;
+					m_secondaryFragColor = orangeColVec;
+				}
 			}
-			ImGui::End();
+
+			ImGui::SameLine(0.0f, 20.0f); // horizontal gap of 20px
+
+			assert(m_primaryFragColor != nullptr);
+			assert(m_secondaryFragColor != nullptr);
+
+			{
+				UI_GROUP();
+				ui::undecoratedLink("Fragment shader");
+				ui::coloredDummyGroup("Primary", ImVec2(20.0f, 20.0f), *(const ImVec4*)m_primaryFragColor);
+				ImGui::SameLine(0.0f, 20.0f);
+				ui::coloredDummyGroup("Secondary", ImVec2(20.0f, 20.0f), *(const ImVec4*)m_secondaryFragColor);
+			}
 		}
+		ImGui::End();
 	}
 }
