@@ -45,6 +45,20 @@ target_sources(Excelsior
         "src/ui/DebugOverlay.cpp"
 )
 
+option(ENABLE_EXERCISE "Build Exercise subsystem for OpenGL experiments (defaults to OFF)" OFF)
+
+if(ENABLE_EXERCISE)
+    set(EXERCISE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/ui/exercise")
+
+    set(EXERCISE_SOURCES
+        "${EXERCISE_DIR}/Exercise.cpp"
+        "${EXERCISE_DIR}/drawExerciseSelectWindow.cpp"
+    )
+    target_sources(Excelsior PRIVATE ${EXERCISE_SOURCES})
+    target_compile_definitions(Excelsior PRIVATE ENABLE_EXERCISE)
+endif()
+
+
 set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendored/imgui")
 
 set(IMGUI_SOURCES
@@ -75,6 +89,7 @@ target_sources(Excelsior
 set_source_files_properties(
     "src/gl.c"
     ${IMGUI_SOURCES}
+    #"src/ui/exercise/ExerciseSelectWindow.cpp"
     PROPERTIES
         SKIP_PRECOMPILE_HEADERS ON
 )
