@@ -43,6 +43,9 @@ target_sources(Excelsior
         "src/ui/AppUi.hpp"
         "src/ui/WindowChrome.cpp"
         "src/ui/DebugOverlay.cpp"
+        "src/ui/utils.cpp"
+        "src/ui/utils.hpp"
+        "src/ui/imgui_raii.hpp"
 )
 
 option(ENABLE_EXERCISE "Build exercises from https://learnopengl.com/ (defaults to OFF)" OFF)
