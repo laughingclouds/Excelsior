@@ -16,11 +16,23 @@ namespace excelsior::exercise {
 		TWO_TRIANGLES_DIFF_COL // next to ech other, different color
 	};
 
+	enum class GLState {
+		GLOBAL,			// default state
+		INITIALIZED,	// initGL called
+		DESTROYED,		// destroyGL called
+	};
+
 	class Exercise {
 	public:
 		Exercise();
 
-		~Exercise();
+		/*Initialize Vertex Array Object & Buffer Objects (VBO, EBO) */
+		void initGL();
+
+		// Destroy all that initGL() (and additional) created.
+		void destroyGL();
+
+		void render();
 
 		// draw complete ui
 		void draw(const AppWorkArea workArea);
@@ -37,7 +49,12 @@ namespace excelsior::exercise {
 		const float* m_primaryFragColor;
 		const float* m_secondaryFragColor;
 
-		unsigned int m_shaderProgram;
+		unsigned int m_shaderProgram = 0;
+		unsigned int m_vao = 0; // vertex array object
+		unsigned int m_vbo = 0; // vertex buffer object
+		unsigned int m_ebo = 0; // element buffer object
+
+		GLState m_GLstate = GLState::GLOBAL;
 	};
 
 	extern Exercise ex;
