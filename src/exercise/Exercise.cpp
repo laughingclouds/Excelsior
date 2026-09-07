@@ -78,13 +78,34 @@ namespace excelsior::exercise {
 		m_GLstate = GLState::DESTROYED;
 	}
 
+	// count - number of elements to draw
+	// index - element offset from indices[] array
+	void drawTriangles(const GLfloat* fragCol, GLsizei count, int index) {
+		glUniform4fv(glsl::uColor, 1, fragCol);
+		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, reinterpret_cast<const void*>(index * sizeof(GL_UNSIGNED_INT)));
+	}
+
 	void Exercise::render() {
 		assert(m_GLstate == GLState::INITIALIZED);
 
-		glUseProgram(m_shaderProgram);
-		glBindVertexArray(m_vao);
-		glUniform4fv(glsl::uColor, 1, m_primaryFragColor);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		switch (m_type) {
+		case Type::DEFAULT_TRIANGLE:
+			glUseProgram(m_shaderProgram);
+			glBindVertexArray(m_vao);
+			drawTriangles(m_primaryFragColor, 3, 0);
+			break;
+		case Type::RECTANGLE:
+			drawTriangles(m_primaryFragColor, 6, 3);
+			break;
+		case Type::TWO_TRIANGLES:
+			drawTriangles(m_primaryFragColor, 6, 9);
+			break;
+		case Type::TWO_TRIANGLES_DIFF_COL:
+			drawTriangles(m_primaryFragColor, 3, 9);
+			drawTriangles(m_secondaryFragColor, 3, 12);
+			break;
+		}
+
 	}
 
 	void Exercise::draw(const AppWorkArea workArea) {
