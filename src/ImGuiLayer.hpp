@@ -20,9 +20,9 @@ namespace excelsior {
 		void processEvent(const SDL_Event& event);
 		
 		/* Start a new ImGui Frame by calling ImGui::NewFrame(); */
-		void beginFrame();
+		void beginFrame() const;
 		
-		void render(const std::array<float, 4>& clearColor);
+		void render() const;
 
 	private:
 		Window& m_window;

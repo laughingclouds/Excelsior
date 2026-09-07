@@ -1,5 +1,6 @@
 #include "Window.hpp"
 
+#include <array>
 #include <format>
 #include <stdexcept>
 
@@ -124,6 +125,19 @@ namespace excelsior {
 
 	void Window::swapBuffers() const {
 		SDL_GL_SwapWindow(m_window.get());
+	}
+
+	void Window::clear(const std::array<float, 4>& clearColor) const {
+		const auto [width, height] = framebufferSize();
+		glViewport(0, 0, width, height);
+		glClearColor(
+			clearColor[0] * clearColor[3],
+			clearColor[1] * clearColor[3],
+			clearColor[2] * clearColor[3],
+			clearColor[3]
+		);
+
+		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
 	bool Window::toggleMaximize() {

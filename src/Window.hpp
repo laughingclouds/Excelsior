@@ -46,6 +46,9 @@ public:
 
 	void swapBuffers() const;
 
+	// call glClear
+	void clear(const std::array<float, 4>& clearColor) const;
+
 	// call either maximize or restore
 	bool toggleMaximize();
 

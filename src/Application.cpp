@@ -53,7 +53,10 @@ namespace excelsior {
 		
 		m_ui.draw();
 
-		m_imgui.render(m_clearColor);
+		m_window.clear(m_clearColor);
+
+		m_imgui.render();
+
 		m_window.swapBuffers();
 
 		if (m_shouldQuit) {
