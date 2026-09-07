@@ -33,10 +33,10 @@ namespace excelsior::exercise {
 		if (ImGui::Begin("Rendering", nullptr, flags)) {
 			ui::spacerY();
 			ImGui::TextUnformatted("Exercise");
-			ImGui::RadioButton("Triangle (Default)", &m_type, DEFAULT_TRIANGLE);
-			ImGui::RadioButton("Rectangle", &m_type, RECTANGLE);
-			ImGui::RadioButton("Two Triangles", &m_type, TWO_TRIANGLES);
-			ImGui::RadioButton("Two Triangles (Different Color)", &m_type, TWO_TRIANGLES_DIFF_COL);
+			ImGui::RadioButton("Triangle (Default)", (int*)&m_type, (int)Type::DEFAULT_TRIANGLE);
+			ImGui::RadioButton("Rectangle", (int*)&m_type, (int)Type::RECTANGLE);
+			ImGui::RadioButton("Two Triangles", (int*)&m_type, (int)Type::TWO_TRIANGLES);
+			ImGui::RadioButton("Two Triangles (Different Color)", (int*)&m_type, (int)Type::TWO_TRIANGLES_DIFF_COL);
 			ui::spacerY();
 			ImGui::Checkbox("Wireframe", &m_isPolygonMode);
 			ui::spacerY();

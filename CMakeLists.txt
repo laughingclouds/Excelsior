@@ -51,11 +51,14 @@ target_sources(Excelsior
 option(ENABLE_EXERCISE "Build exercises from https://learnopengl.com/ (defaults to OFF)" OFF)
 
 if(ENABLE_EXERCISE)
-    set(EXERCISE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/ui/exercise")
+    set(EXERCISE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/exercise")
 
     set(EXERCISE_SOURCES
         "${EXERCISE_DIR}/Exercise.cpp"
+        "${EXERCISE_DIR}/Exercise.hpp"
         "${EXERCISE_DIR}/drawExerciseSelectWindow.cpp"
+        "${EXERCISE_DIR}/shader.cpp"
+        "${EXERCISE_DIR}/shader.hpp"
     )
     target_sources(Excelsior PRIVATE ${EXERCISE_SOURCES})
     target_compile_definitions(Excelsior PRIVATE ENABLE_EXERCISE)
