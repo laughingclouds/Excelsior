@@ -39,6 +39,8 @@ namespace excelsior::exercise {
 
 		void setShaderProgram(unsigned int shaderProgram);
 
+		void setWireframe() const;
+
 	private:
 		// draw a render selection window in mid-left
 		void drawExerciseSelectWindow(const AppWorkArea workArea);

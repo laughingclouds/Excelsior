@@ -38,7 +38,9 @@ namespace excelsior::exercise {
 			ImGui::RadioButton("Two Triangles", (int*)&m_type, (int)Type::TWO_TRIANGLES);
 			ImGui::RadioButton("Two Triangles (Different Color)", (int*)&m_type, (int)Type::TWO_TRIANGLES_DIFF_COL);
 			ui::spacerY();
-			ImGui::Checkbox("Wireframe", &m_isPolygonMode);
+			if (ImGui::Checkbox("Wireframe", &m_isPolygonMode)) {
+				setWireframe();
+			}
 			ui::spacerY();
 
 			{

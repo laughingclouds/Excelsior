@@ -94,4 +94,8 @@ namespace excelsior::exercise {
 	void Exercise::setShaderProgram(unsigned int shaderProgram) {
 		m_shaderProgram = shaderProgram;
 	}
+
+	void Exercise::setWireframe() const {
+		glPolygonMode(GL_FRONT_AND_BACK, m_isPolygonMode ? GL_LINE : GL_FILL);
+	}
 }
