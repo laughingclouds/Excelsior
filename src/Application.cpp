@@ -6,6 +6,10 @@
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_timer.h>
 
+#ifdef ENABLE_EXERCISE
+#include "exercise/Exercise.hpp"
+#include "exercise/shader.hpp"
+#endif
 
 namespace excelsior {
 
@@ -20,6 +24,9 @@ namespace excelsior {
 		m_ui(m_window, m_penInput, m_clearColor, m_shouldQuit, m_overlayText),
 		m_overlayText(getMsg())
 	{
+		#ifdef ENABLE_EXERCISE
+		exercise::initializeShaderProgram();
+		#endif
 	}
 
 	SDL_AppResult Application::handleEvent(const SDL_Event& event) {
