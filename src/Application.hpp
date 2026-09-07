@@ -23,6 +23,8 @@ namespace excelsior {
 		To be called in SDL_AppInit*/
 		Application();
 
+		~Application();
+
 		// Call within SDL_AppEvent
 		SDL_AppResult handleEvent(const SDL_Event& event);
 

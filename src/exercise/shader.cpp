@@ -87,7 +87,7 @@ static GLuint createProgram(GLuint vertexShader, GLuint fragmentShader) {
 
 namespace excelsior::exercise {
 
-	void initializeShaderProgram() {
+	void initShaderProgram() {
 		GLuint vertexShader = createShader(GL_VERTEX_SHADER, vertexShaderSource, QueryType::VERTEX);
 		GLuint fragmentShader = createShader(GL_FRAGMENT_SHADER, fragmentShaderSource, QueryType::FRAGMENT);
 

@@ -25,7 +25,14 @@ namespace excelsior {
 		m_overlayText(getMsg())
 	{
 		#ifdef ENABLE_EXERCISE
-		exercise::initializeShaderProgram();
+		exercise::initShaderProgram();
+		exercise::ex.initGL();
+		#endif
+	}
+
+	Application::~Application() {
+		#ifdef ENABLE_EXERCISE
+		exercise::ex.destroyGL();
 		#endif
 	}
 
@@ -61,6 +68,10 @@ namespace excelsior {
 		m_ui.draw();
 
 		m_window.clear(m_clearColor);
+
+		#ifdef ENABLE_EXERCISE
+		exercise::ex.render();
+		#endif
 
 		m_imgui.render();
 
