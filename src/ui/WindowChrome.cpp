@@ -22,6 +22,8 @@ namespace excelsior {
 		ImGui::SetNextWindowPos(viewport->Pos, ImGuiCond_Always);
 		ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, m_chromeHeight), ImGuiCond_Always);
 
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, reinterpret_cast<const ImVec4&>(m_clearColor)); // window chrome bg
+
 		ImGui::Begin("Excelsior###MainWindowChrome",
 			nullptr,
 			ImGuiWindowFlags_NoDecoration |
@@ -65,6 +67,7 @@ namespace excelsior {
 		ImGui::PopStyleColor(2);
 
 		ImGui::End();
+		ImGui::PopStyleColor(1); // window chrome bg
 		ImGui::PopStyleVar(3);
 	}
 }
