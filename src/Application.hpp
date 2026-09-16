@@ -34,9 +34,9 @@ namespace excelsior {
 	private:	
 
 		std::array<float, 4> m_clearColor{
-			0.45f,	// r
-			0.55f,	// g
-			0.60f,	// b
+			0.0f,	// r
+			0.0f,	// g
+			0.0f,	// b
 			1.00f	// a
 		};
 
