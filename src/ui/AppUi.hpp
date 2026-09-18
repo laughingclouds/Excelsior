@@ -20,6 +20,9 @@ namespace excelsior {
 
 		void draw();
 
+		#ifdef ENABLE_EXERCISE
+		bool m_showExercise = true;
+		#endif
 	private:
 		// update window layout related values
 		// always call before draw()

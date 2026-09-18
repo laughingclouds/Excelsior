@@ -34,7 +34,8 @@ namespace excelsior {
 		drawDebugOverlay(workArea);
 		
 		#ifdef ENABLE_EXERCISE
-				exercise::ex.draw(workArea);
+		if (m_showExercise)
+			exercise::ex.draw(workArea);
 		#endif
 
 		if (m_showDemoWindow)

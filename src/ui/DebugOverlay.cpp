@@ -38,6 +38,12 @@ namespace excelsior {
 			ImGui::TextUnformatted(m_overlayText.c_str());
 			ImGui::SameLine();
 			ImGui::Checkbox("Demo Window", &m_showDemoWindow);
+
+			#ifdef ENABLE_EXERCISE
+			ImGui::SameLine();
+			ImGui::Checkbox("Exercise", &m_showExercise);
+			#endif
+
 			ImGui::Separator();
 
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);

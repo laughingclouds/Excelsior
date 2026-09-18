@@ -76,6 +76,7 @@ namespace excelsior {
 		m_window.clear(m_clearColor);
 
 		#ifdef ENABLE_EXERCISE
+		if (m_ui.m_showExercise)
 			exercise::ex.render();
 		#endif
 
