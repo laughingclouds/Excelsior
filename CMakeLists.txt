@@ -13,8 +13,12 @@ project ("Excelsior")
 
 # https://github.com/libsdl-org/SDL.git
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
+# set the output directory for built objects.
+# Since we're also using CMakePresets.json we don't need to append $<CONFIG>
+# it would have created something like "/out/build/x64-debug/Debug/Calculator.exe"
+# instead with this cmake will make "/out/build/x64-debug/bin/Calculator.exe"
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 add_subdirectory("vendored/SDL" EXCLUDE_FROM_ALL)
 
