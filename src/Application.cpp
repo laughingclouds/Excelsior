@@ -60,7 +60,7 @@ namespace excelsior {
 
 	SDL_AppResult Application::update() {
 		if (m_window.isMinimized()) {
-			SDL_Delay(10); // Throttle loop
+			SDL_Delay(100); // Throttle loop
 			return SDL_APP_CONTINUE;
 		}
 
