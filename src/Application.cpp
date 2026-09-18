@@ -1,6 +1,7 @@
 #include "Application.hpp"
 
 #include "Stroke.hpp"
+#include "config.hpp"
 
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_init.h>
@@ -24,16 +25,16 @@ namespace excelsior {
 		m_ui(m_window, m_penInput, m_clearColor, m_shouldQuit, m_overlayText),
 		m_overlayText(getMsg())
 	{
-		#ifdef ENABLE_EXERCISE
+		if constexpr (kEnableExercise) {
 		exercise::initShaderProgram();
 		exercise::ex.initGL();
-		#endif
+		}
 	}
 
 	Application::~Application() {
-		#ifdef ENABLE_EXERCISE
+		if constexpr (kEnableExercise) {
 		exercise::ex.destroyGL();
-		#endif
+		}
 	}
 
 	SDL_AppResult Application::handleEvent(const SDL_Event& event) {
@@ -69,9 +70,9 @@ namespace excelsior {
 
 		m_window.clear(m_clearColor);
 
-		#ifdef ENABLE_EXERCISE
+		if constexpr (kEnableExercise) {
 		exercise::ex.render();
-		#endif
+		}
 
 		m_imgui.render();
 

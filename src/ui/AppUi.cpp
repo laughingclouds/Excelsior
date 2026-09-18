@@ -4,6 +4,8 @@
 #include "Window.hpp"
 #include "PenInput.hpp"
 
+#include "config.hpp"
+
 #ifdef ENABLE_EXERCISE
 #include "exercise/Exercise.hpp"
 #endif
@@ -37,10 +39,9 @@ namespace excelsior {
 
 		drawDebugOverlay(workArea);
 		
-		#ifdef ENABLE_EXERCISE
-		exercise::ex.draw(workArea);
-		#endif
-
+		if constexpr (kEnableExercise) {
+			exercise::ex.draw(workArea);
+		}
 	}
 
 	void AppUi::updateLayout() {
