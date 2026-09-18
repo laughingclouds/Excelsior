@@ -23,7 +23,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 add_subdirectory("vendored/SDL" EXCLUDE_FROM_ALL)
 
 # Add source to this project's executable.
-add_executable (Excelsior WIN32 "src/Excelsior.cpp")
+add_executable (Excelsior "src/Excelsior.cpp")
+
+set_property(TARGET Excelsior PROPERTY
+    WIN32_EXECUTABLE "$<CONFIG:Release>"
+)
 
 find_package(OpenGL REQUIRED)
 
