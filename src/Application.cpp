@@ -1,7 +1,6 @@
 #include "Application.hpp"
 
 #include "Stroke.hpp"
-#include "config.hpp"
 
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_events.h>
@@ -28,19 +27,19 @@ namespace excelsior {
 		m_ui(m_window, m_penInput, m_clearColor, m_shouldQuit, m_overlayText),
 		m_overlayText(getMsg())
 	{
-		if constexpr (kEnableExercise) {
+		#ifdef ENABLE_EXERCISE
 			exercise::initShaderProgram();
 			exercise::ex.initGL();
-		}
+		#endif
 
 		if (!SDL_SetHint(SDL_HINT_MAIN_CALLBACK_RATE, "waitevent"))
 			SDL_Log("Couldn't set main callback rate hint to waitevent: %s", SDL_GetError());
 	}
 
 	Application::~Application() {
-		if constexpr (kEnableExercise) {
+		#ifdef ENABLE_EXERCISE
 			exercise::ex.destroyGL();
-		}
+		#endif
 	}
 
 	SDL_AppResult Application::handleEvent(const SDL_Event& event) {
@@ -76,9 +75,9 @@ namespace excelsior {
 
 		m_window.clear(m_clearColor);
 
-		if constexpr (kEnableExercise) {
+		#ifdef ENABLE_EXERCISE
 			exercise::ex.render();
-		}
+		#endif
 
 		m_imgui.render();
 

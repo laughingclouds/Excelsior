@@ -37,8 +37,6 @@ target_sources(Excelsior
         "src/PenInput.cpp"
         "src/PenInput.hpp"
 
-        "src/config.hpp"
-
         "src/ui/AppWorkArea.cpp"
         "src/ui/AppWorkArea.hpp"
         "src/ui/AppUi.cpp"
